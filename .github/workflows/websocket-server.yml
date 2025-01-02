@@ -1,0 +1,40 @@
+name: Websocket-server CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - '!nextjs/**'
+      - 'websocket-server/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '!nextjs/**'
+      - 'websocket-server/**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 23
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23.x'
+
+      - name: Cache npm dependencies for websocket-server
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-websocket-server-${{ hashFiles('websocket-server/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-websocket-server-
+
+      - name: Install dependencies and run tests for websocket-server
+        working-directory: ./websocket-server
+        run: |
+          npm ci
+          npm run build --if-present
+          npm test
