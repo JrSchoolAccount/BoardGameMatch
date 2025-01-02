@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "nodemon *",
     "start": "NODE_ENV=production node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Implement testing\""
   },
   "dependencies": {
     "express": "^4.21.2",
