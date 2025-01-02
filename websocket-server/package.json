@@ -1,0 +1,23 @@
+{
+  "name": "websocket-server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "JR",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon *",
+    "start": "NODE_ENV=production node app.js",
+    "test": "echo \"Implement testing\""
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongoose": "^8.9.3",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "nodemon": "^3.1.9"
+  }
+}
