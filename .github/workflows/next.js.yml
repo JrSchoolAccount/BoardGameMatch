@@ -36,8 +36,8 @@ jobs:
         working-directory: ./nextjs
         env:
           NEXTAUTH_URL: http://localhost:3000
-          GITHUB_ID: ${{ secrets.SECRET_GITHUB_CLIENT }}
-          GITHUB_SECRET: ${{ secrets.CLIENT_ID_GITHUB }}
+          GITHUB_CLIENT_ID: ${{ secrets.SECRET_GITHUB_CLIENT }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.CLIENT_ID_GITHUB }}
         run: |
           npm ci
           npm run build --if-present
