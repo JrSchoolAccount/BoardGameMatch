@@ -17,4 +17,8 @@ export const options: AuthOptions = {
         }),
     ],
     secret: NEXTAUTH_SECRET,
+    pages: {
+        signIn: '/signin',
+        signOut: '/signout',
+    }
 };
