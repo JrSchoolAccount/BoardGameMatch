@@ -1,5 +1,5 @@
 import type {AuthOptions} from "next-auth";
-import GitHubProvider from "next-auth/providers/GitHub";
+import GitHubProvider from "next-auth/providers/github";
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
