@@ -25,7 +25,7 @@ const Navbar = async () => {
                     <>
                         <li>
                             <Link href="/chat" className="text-white hover:underline">
-                                Profile
+                                Chat
                             </Link>
                         </li>
 
