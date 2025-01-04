@@ -1,12 +1,12 @@
-import {Server} from "socket.io";
-import Message from "../models/message.js";
+import {Server} from 'socket.io';
+import Message from '../models/message.js';
 
 class WebSocketServer {
     constructor(httpServer) {
         this.io = new Server(httpServer, {
             cors: {
-                origin: "*",  // Replace with specific origin before production
-                methods: ["GET", "POST"],
+                origin: '*',  // Replace with specific origin before production
+                methods: ['GET', 'POST'],
             },
         });
 
@@ -21,7 +21,7 @@ class WebSocketServer {
                 .sort({timestamp: -1})
                 .limit(10)
                 .then((messages) => {
-                    socket.emit('chat-history', messages.reverse());
+                    socket.emit('profile-history', messages.reverse());
                 });
 
             socket.on('message', async (data) => {
