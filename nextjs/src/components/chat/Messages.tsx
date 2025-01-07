@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Session} from 'next-auth';
 import {socket} from '@/app/socket';
 import formatTimestamp from '@/components/chat/formatTimestamp';
@@ -20,6 +20,13 @@ const Messages = ({session}: MessagesProps) => {
     const [message, setMessage] = useState<string>('');
     const [messages, setMessages] = useState<Message[]>([]);
     const [isConnected, setIsConnected] = useState(false);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     useEffect(() => {
         const onConnect = () => {
@@ -116,7 +123,9 @@ const Messages = ({session}: MessagesProps) => {
             </div>
 
             {/* Messages Section */}
-            <div className="w-full flex-col flex-grow bg-gray-100 dark:bg-gray-900 my-2 p-2 overflow-y-auto">
+            <div
+                className="w-full scroll-auto flex-col flex-grow bg-gray-100 dark:bg-gray-900 my-2 p-2 overflow-y-auto"
+                ref={chatContainerRef}>
                 <div className="flex flex-col items-start space-y-2">
                     {messages.map((msg, index) => (
                         <div
