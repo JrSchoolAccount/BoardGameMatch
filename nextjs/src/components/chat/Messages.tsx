@@ -4,6 +4,7 @@ import Image from 'next/image';
 import {useEffect, useState} from 'react';
 import {Session} from 'next-auth';
 import {socket} from '@/app/socket';
+import formatTimestamp from '@/components/chat/formatTimestamp';
 
 interface MessagesProps {
     session: Session | null;
@@ -126,8 +127,16 @@ const Messages = ({session}: MessagesProps) => {
                                 className={`p-3 mb-2 max-w-sm w-auto rounded-2xl ${msg.username === session?.user?.name ? 'bg-purple-500 dark:bg-gray-800' : 'bg-purple-300 dark:bg-gray-800'}`}
                             >
                                 <div className="text-xs text-gray-600 dark:text-gray-200">{msg.username}</div>
-                                <div className="text-gray-700 dark:text-gray-200">{msg.message}</div>
-                                <div className="text-xs text-gray-400">{msg.timestamp}</div>
+                                <div className="group relative">
+                                    {/* Message Content */}
+                                    <div className="text-gray-700 dark:text-gray-200">{msg.message}</div>
+
+                                    {/* Timestamp */}
+                                    <div
+                                        className="absolute -bottom-7 left-0 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {formatTimestamp(msg.timestamp)}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ))}
