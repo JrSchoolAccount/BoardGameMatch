@@ -1,11 +1,12 @@
 import Conversation from '@/components/chat/Conversation';
 import Messages from '@/components/chat/Messages';
-import {getServerSession} from 'next-auth';
-import {options} from '@/app/api/auth/[...nextauth]/options';
+import {Session} from 'next-auth';
 
-const Chat = async () => {
-    const session = await getServerSession(options);
+interface ChatProps {
+    session: Session | null;
+}
 
+const Chat = ({session}: ChatProps) => {
     return (
         <div className="flex bg-white dark:bg-gray-900">
             {/* Chat Section */}
@@ -35,7 +36,7 @@ const Chat = async () => {
 
             {/* Messages */}
             <div className="flex-grow h-screen p-2 rounded-md">
-                <Messages/>
+                <Messages session={session}/>
             </div>
         </div>
     );

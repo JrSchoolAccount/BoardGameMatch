@@ -1,6 +1,66 @@
-import Image from 'next/image';
+'use client';
 
-const Messages = () => {
+import Image from 'next/image';
+import {useEffect, useState} from 'react';
+import {Session} from 'next-auth';
+import {socket} from '@/app/socket';
+
+interface MessagesProps {
+    session: Session | null;
+}
+
+interface Message {
+    username: string;
+    message: string;
+    timestamp: string;
+}
+
+const Messages = ({session}: MessagesProps) => {
+    const [message, setMessage] = useState<string>('');
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isConnected, setIsConnected] = useState(false);
+
+    useEffect(() => {
+        const onConnect = () => {
+            setIsConnected(true);
+        };
+
+        const onDisconnect = () => {
+            setIsConnected(false);
+        };
+
+        socket.on('connect', onConnect);
+        socket.on('disconnect', onDisconnect);
+
+        socket.on('profile-history', (history: Message[]) => {
+            setMessages(history);
+        });
+
+        socket.on('message', (newMessage: Message) => {
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+        });
+
+        return () => {
+            socket.off('connect', onConnect);
+            socket.off('disconnect', onDisconnect);
+            socket.off('message');
+            socket.off('profile-history');
+        };
+    }, []);
+
+    const sendMessage = () => {
+        if (message.trim() && session?.user?.name) {
+            const newMessage = {
+                username: session.user.name,
+                message: message,
+                timestamp: new Date().toISOString(),
+            };
+
+            socket.emit('message', newMessage);
+
+            setMessage('');
+        }
+    };
     return (
         <div className="flex-grow h-full flex flex-col">
             {/* Header Section */}
@@ -55,38 +115,25 @@ const Messages = () => {
             </div>
 
             {/* Messages Section */}
-            <div className="w-full flex-grow bg-gray-100 dark:bg-gray-900 my-2 p-2 overflow-y-auto">
-                {/* Incoming Message */}
-                <div className="flex items-end w-3/4">
-                    <Image
-                        className="hidden w-8 h-8 m-3 rounded-full"
-                        src="https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027366_960_720.png"
-                        alt="avatar"
-                        width={32}
-                        height={32}
-                    />
-                    <div
-                        className="p-3 bg-purple-300 dark:bg-gray-800 mx-3 my-1 rounded-2xl rounded-bl-none sm:w-3/4 md:w-3/6">
-                        <div className="text-xs text-gray-600 dark:text-gray-200">John Doe</div>
-                        <div className="text-gray-700 dark:text-gray-200">Hey there! Are you finished creating the chat
-                            app?
+            <div className="w-full flex-col flex-grow bg-gray-100 dark:bg-gray-900 my-2 p-2 overflow-y-auto">
+                <div className="flex flex-col items-start space-y-2">
+                    {messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`flex ${msg.username === session?.user?.name ? 'justify-end' : 'justify-start'} w-full`}
+                        >
+                            <div
+                                className={`p-3 mb-2 max-w-sm w-auto rounded-2xl ${msg.username === session?.user?.name ? 'bg-purple-500 dark:bg-gray-800' : 'bg-purple-300 dark:bg-gray-800'}`}
+                            >
+                                <div className="text-xs text-gray-600 dark:text-gray-200">{msg.username}</div>
+                                <div className="text-gray-700 dark:text-gray-200">{msg.message}</div>
+                                <div className="text-xs text-gray-400">{msg.timestamp}</div>
+                            </div>
                         </div>
-                        <div className="text-xs text-gray-400">Now</div>
-                    </div>
+                    ))}
                 </div>
-
-                {/* Outgoing Messages */}
-                <div className="flex justify-end">
-                    <div
-                        className="flex items-end w-auto bg-purple-500 dark:bg-gray-800 m-1 rounded-xl rounded-br-none sm:w-3/4 md:w-auto">
-                        <div className="p-2">
-                            <div className="text-gray-200">Not yet, but im getting there!</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Add Additional Messages Below */}
             </div>
+
 
             {/* Input Section */}
             <div className="h-15 p-3 rounded-xl rounded-tr-none rounded-tl-none bg-gray-100 dark:bg-gray-800">
@@ -100,12 +147,8 @@ const Messages = () => {
                             viewBox="0 0 24 24"
                             stroke="currentColor"
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                  d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
                     {/* Input Field */}
@@ -113,10 +156,19 @@ const Messages = () => {
                         <input
                             className="input text-gray-700 dark:text-gray-200 text-sm p-5 focus:outline-none bg-gray-100 dark:bg-gray-800 flex-grow rounded-l-md"
                             type="text"
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') sendMessage();
+                            }}
                             placeholder="Type your message ..."
                         />
                         <div
-                            className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 flex justify-center items-center pr-3 text-gray-400 rounded-r-md">
+                            role="button"
+                            tabIndex={0}
+                            className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 flex justify-center items-center pr-3 text-gray-400 rounded-r-md"
+                            onClick={sendMessage}
+                        >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-6 w-6"
@@ -124,12 +176,8 @@ const Messages = () => {
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
                             >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                                />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                             </svg>
                         </div>
                     </div>

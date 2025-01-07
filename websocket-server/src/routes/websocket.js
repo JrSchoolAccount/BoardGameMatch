@@ -5,7 +5,7 @@ class WebSocketServer {
     constructor(httpServer) {
         this.io = new Server(httpServer, {
             cors: {
-                origin: '*',  // Replace with specific origin before production
+                origin: 'http://localhost:3000',  // Replace with specific origin before production
                 methods: ['GET', 'POST'],
             },
         });
@@ -15,12 +15,14 @@ class WebSocketServer {
 
     setupSocketEvents() {
         this.io.on('connection', (socket) => {
-            console.log(`Client connected: ${socket.id}`);
+            console.log(`Client connected: ${socket.id}, Origin: ${socket.handshake.headers.origin}`);
+            console.log(`Total clients connected: ${this.io.engine.clientsCount}`);
 
             Message.find()
                 .sort({timestamp: -1})
                 .limit(10)
                 .then((messages) => {
+                    console.log('Emitting profile history:', messages.length);
                     socket.emit('profile-history', messages.reverse());
                 });
 
