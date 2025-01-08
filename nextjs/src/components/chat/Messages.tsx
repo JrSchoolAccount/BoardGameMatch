@@ -2,27 +2,12 @@
 
 import Image from 'next/image';
 import {useEffect, useRef, useState} from 'react';
-import {Session} from 'next-auth';
-import {socket} from '@/app/socket';
 import formatTimestamp from '@/components/chat/formatTimestamp';
+import {MessagesProps} from '@/components/chat/models/MessagesProps';
 
-interface MessagesProps {
-    session: Session | null;
-}
-
-interface Message {
-    username: string;
-    message: string;
-    timestamp: string;
-}
-
-const Messages = ({session}: MessagesProps) => {
+const Messages = ({session, messages, isLoading, isConnected, errorMessage, sendMessage}: MessagesProps) => {
     const [message, setMessage] = useState<string>('');
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [isConnected, setIsConnected] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
-    const [errorMessage, setErrorMessage] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (chatContainerRef.current) {
@@ -30,53 +15,13 @@ const Messages = ({session}: MessagesProps) => {
         }
     }, [messages]);
 
-    useEffect(() => {
-        const onConnect = () => {
-            setIsConnected(true);
-        };
-
-        const onDisconnect = () => {
-            setIsConnected(false);
-        };
-
-        const handleConnectError = (error: Error) => {
-            setIsConnected(false);
-            setErrorMessage('Unable to connect to the server. Please try again later.');
-            setIsLoading(false);
-        };
-
-        socket.on('connect', onConnect);
-        socket.on('disconnect', onDisconnect);
-
-        socket.on('profile-history', (history: Message[]) => {
-            setMessages(history);
-        });
-
-        socket.on('message', (newMessage: Message) => {
-            setMessages((prevMessages) => [...prevMessages, newMessage]);
-        });
-
-        return () => {
-            socket.off('connect', onConnect);
-            socket.off('disconnect', onDisconnect);
-            socket.off('message');
-            socket.off('profile-history');
-        };
-    }, []);
-
-    const sendMessage = () => {
-        if (message.trim() && session?.user?.name) {
-            const newMessage = {
-                username: session.user.name,
-                message: message,
-                timestamp: new Date().toISOString(),
-            };
-
-            socket.emit('message', newMessage);
-
+    const handleSendMessage = () => {
+        if (message.trim()) {
+            sendMessage(message);
             setMessage('');
         }
     };
+
     return (
         <div className="flex-grow h-full flex flex-col">
             {/* Header Section */}
@@ -158,7 +103,7 @@ const Messages = ({session}: MessagesProps) => {
                         <p className="text-red-500">{errorMessage}</p>
                     </div>
                 ) : (
-                    <div className={`status ${isConnected ? 'text-green-500' : 'text-red-500'}`}>
+                    <div className={`text-center status ${isConnected ? 'text-green-500' : 'text-red-500'}`}>
                         {isConnected ? 'Connected to the server' : 'Disconnected'}
                     </div>
                 )}
@@ -214,7 +159,7 @@ const Messages = ({session}: MessagesProps) => {
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') sendMessage();
+                                if (e.key === 'Enter') handleSendMessage();
                             }}
                             placeholder="Type your message ..."
                         />
@@ -222,7 +167,7 @@ const Messages = ({session}: MessagesProps) => {
                             role="button"
                             tabIndex={0}
                             className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 flex justify-center items-center pr-3 text-gray-400 rounded-r-md"
-                            onClick={sendMessage}
+                            onClick={handleSendMessage}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"

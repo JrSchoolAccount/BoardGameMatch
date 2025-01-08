@@ -1,12 +1,79 @@
+'use client';
+
 import Conversation from '@/components/chat/Conversation';
 import Messages from '@/components/chat/Messages';
 import {Session} from 'next-auth';
+import {useEffect, useState} from 'react';
+import {socket} from '@/app/socket';
+import {Message} from '@/components/chat/models/Message';
 
 interface ChatProps {
     session: Session | null;
 }
 
 const Chat = ({session}: ChatProps) => {
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isConnected, setIsConnected] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    useEffect(() => {
+        if (messages.length == 0 && isConnected) {
+            setIsLoading(true);
+        }
+    }, [messages, isConnected]);
+
+    useEffect(() => {
+        const handleConnect = () => {
+            setIsConnected(true);
+            setIsLoading(false);
+        };
+
+        const handleDisconnect = () => {
+            setIsConnected(false);
+        };
+
+        const handleMessage = (newMessage: Message) => {
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+        };
+
+        const handleConnectError = () => {
+            setIsConnected(false);
+            setErrorMessage('Unable to connect to the server. Please try again later.');
+            setIsLoading(false);
+        };
+
+        const handleHistory = (history: Message[]) => {
+            setMessages(history);
+            setIsLoading(false);
+        };
+
+        socket.on('connect', handleConnect);
+        socket.on('disconnect', handleDisconnect);
+        socket.on('profile-history', handleHistory);
+        socket.on('message', handleMessage);
+
+        return () => {
+            socket.off('connect', handleConnect);
+            socket.off('disconnect', handleDisconnect);
+            socket.off('connect-error', handleConnectError);
+            socket.off('message');
+            socket.off('profile-history');
+        };
+    }, []);
+
+    const sendMessage = (message: string) => {
+        if (message.trim() && session?.user?.name) {
+            const newMessage = {
+                username: session.user.name,
+                message: message,
+                timestamp: new Date().toISOString(),
+            };
+
+            socket.emit('message', newMessage);
+        }
+    };
+
     return (
         <div className="flex bg-white dark:bg-gray-900">
             {/* Chat Section */}
@@ -36,7 +103,14 @@ const Chat = ({session}: ChatProps) => {
 
             {/* Messages */}
             <div className="flex-grow h-screen p-2 rounded-md">
-                <Messages session={session}/>
+                <Messages
+                    session={session}
+                    messages={messages}
+                    isLoading={isLoading}
+                    isConnected={isConnected}
+                    errorMessage={errorMessage}
+                    sendMessage={sendMessage}
+                />
             </div>
         </div>
     );
