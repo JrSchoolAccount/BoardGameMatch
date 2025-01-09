@@ -1,12 +1,12 @@
-import {Server} from "socket.io";
-import Message from "../models/message.js";
+import {Server} from 'socket.io';
+import Message from '../models/message.js';
 
 class WebSocketServer {
     constructor(httpServer) {
         this.io = new Server(httpServer, {
             cors: {
-                origin: "*",  // Replace with specific origin before production
-                methods: ["GET", "POST"],
+                origin: 'http://localhost:3000',  // Replace with specific origin before production
+                methods: ['GET', 'POST'],
             },
         });
 
@@ -15,13 +15,15 @@ class WebSocketServer {
 
     setupSocketEvents() {
         this.io.on('connection', (socket) => {
-            console.log(`Client connected: ${socket.id}`);
+            console.log(`Client connected: ${socket.id}, Origin: ${socket.handshake.headers.origin}`);
+            console.log(`Total clients connected: ${this.io.engine.clientsCount}`);
 
             Message.find()
                 .sort({timestamp: -1})
-                .limit(10)
+                .limit(50)
                 .then((messages) => {
-                    socket.emit('chat-history', messages.reverse());
+                    console.log('Chat history successfully loaded');
+                    socket.emit('profile-history', messages.reverse());
                 });
 
             socket.on('message', async (data) => {

@@ -1,6 +1,6 @@
-import Link from "next/link";
-import {getServerSession} from "next-auth";
-import {options} from "@/app/api/auth/[...nextauth]/options";
+import Link from 'next/link';
+import {getServerSession} from 'next-auth';
+import {options} from '@/app/api/auth/[...nextauth]/options';
 
 
 const Navbar = async () => {
@@ -23,6 +23,12 @@ const Navbar = async () => {
                     </li>
                 ) : (
                     <>
+                        <li>
+                            <Link href="/profile" className="text-white hover:underline">
+                                Profile
+                            </Link>
+                        </li>
+
                         <li>
                             <Link href="/chat" className="text-white hover:underline">
                                 Chat
