@@ -1,6 +1,6 @@
 import {differenceInMinutes, format, isToday, isYesterday} from 'date-fns';
 
-const formatTimestamp = (timestamp: string) => {
+const FormatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
 
     if (differenceInMinutes(new Date(), date) < 1) {
@@ -18,4 +18,4 @@ const formatTimestamp = (timestamp: string) => {
     return format(date, 'dd/MM/yyyy HH:mm'); // For older dates
 };
 
-export default formatTimestamp;
+export default FormatTimestamp;

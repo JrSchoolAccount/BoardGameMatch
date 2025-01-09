@@ -2,12 +2,21 @@
 
 import Image from 'next/image';
 import {useEffect, useRef, useState} from 'react';
-import formatTimestamp from '@/components/chat/formatTimestamp';
+import FormatTimestamp from '@/components/chat/FormatTimestamp';
 import {MessagesProps} from '@/components/chat/models/MessagesProps';
+import dynamic from 'next/dynamic';
+import {useClickAway} from 'react-use';
+import {Theme} from 'emoji-picker-react';
+
+const Picker = dynamic(() => import('emoji-picker-react'), {ssr: false});
 
 const Messages = ({session, messages, isLoading, isConnected, errorMessage, sendMessage}: MessagesProps) => {
     const [message, setMessage] = useState<string>('');
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
+    const emojiPickerRef = useRef<HTMLDivElement>(null);
+
+    useClickAway(emojiPickerRef, () => setShowEmojiPicker(false));
 
     useEffect(() => {
         if (chatContainerRef.current) {
@@ -20,6 +29,14 @@ const Messages = ({session, messages, isLoading, isConnected, errorMessage, send
             sendMessage(message);
             setMessage('');
         }
+    };
+
+    const handleEmojiClick = (emojiData: { emoji: string }) => {
+        setMessage((prevMessage) => prevMessage + emojiData.emoji);
+    };
+
+    const toggleEmojiPicker = () => {
+        setShowEmojiPicker((prev) => !prev);
     };
 
     return (
@@ -125,7 +142,7 @@ const Messages = ({session, messages, isLoading, isConnected, errorMessage, send
                                     {/* Timestamp */}
                                     <div
                                         className="absolute -bottom-7 left-0 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        {formatTimestamp(msg.timestamp)}
+                                        {FormatTimestamp(msg.timestamp)}
                                     </div>
                                 </div>
                             </div>
@@ -139,17 +156,29 @@ const Messages = ({session, messages, isLoading, isConnected, errorMessage, send
             <div className="h-15 p-3 rounded-xl rounded-tr-none rounded-tl-none bg-gray-100 dark:bg-gray-800">
                 <div className="flex items-center">
                     {/* Emoji Icon */}
-                    <div className="p-2 text-gray-600 dark:text-gray-200">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                  d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                    <div className="p-2 text-gray-600 dark:text-gray-200 relative">
+                        <div role="button"
+                             onClick={toggleEmojiPicker}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                      d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        {/* Emoji Picker */}
+                        {showEmojiPicker && (
+                            <div ref={emojiPickerRef} className="absolute bottom-16 left-2 md:left-0 z-50">
+                                <Picker
+                                    onEmojiClick={handleEmojiClick}
+                                    theme={'dark' as Theme}
+                                />
+                            </div>
+                        )}
                     </div>
                     {/* Input Field */}
                     <div className="search-chat flex flex-grow p-2">
