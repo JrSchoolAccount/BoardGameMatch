@@ -3,8 +3,8 @@ import {Button} from '@/components/ui/button';
 import {Clock, Search, Users, Zap} from 'lucide-react';
 import React from 'react';
 import {Input} from '@/components/ui/input';
-import Image from 'next/image';
 import FeatureCard from '@/components/FeatureCard';
+import Image from 'next/image';
 
 const LandingPage = () => {
     return (

@@ -5,7 +5,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Github, Linkedin} from 'lucide-react';
 import {signIn} from 'next-auth/react';
-import Image from 'next/image';
+import Register from '@/components/Register';
 
 export function SignIn() {
     const [isOpen, setIsOpen] = useState(false);
@@ -16,23 +16,15 @@ export function SignIn() {
     return (
         <>
             <Button onClick={openModal} variant="outline" size="sm"
-                    className="text-teal-400 border-teal-400 hover:bg-teal-400/10">
+                    className="w-full sm:w-auto text-teal-400 border-teal-400 hover:bg-teal-400/10">
                 Sign In
             </Button>
 
             {isOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={closeModal}>
-                    <div className="bg-gray-900 p-8 rounded-lg shadow-xl max-w-md w-full"
-                         onClick={(e) => e.stopPropagation()}>
-                        <div className="absolute inset-0 -z-10">
-                            <Image
-                                src="/logo.png"
-                                alt="BoardGameMatch Logo Background"
-                                fill
-                                className="object-contain opacity-10"
-                                priority
-                            />
-                        </div>
+                    <div
+                        className="relative bg-gray-900/95 p-4 sm:p-8 rounded-lg shadow-xl max-w-md w-full mx-4 sm:mx-auto"
+                        onClick={(e) => e.stopPropagation()}>
                         <button
                             onClick={closeModal}
                             className="absolute top-4 right-4 text-gray-400 hover:text-gray-100"
@@ -99,9 +91,7 @@ export function SignIn() {
 
                         <p className="mt-4 text-center text-sm text-gray-400">
                             Don&apos;t have an account?{' '}
-                            <a href="#" className="text-teal-400 hover:underline">
-                                Sign up
-                            </a>
+                            <Register isLink/>
                         </p>
                     </div>
                 </div>
