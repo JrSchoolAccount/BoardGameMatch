@@ -1,5 +1,5 @@
-import {Session} from 'next-auth';
-import {Message} from '@/components/chat/models/Message';
+import { Session } from 'next-auth';
+import { Message } from '@/components/chat/models/Message';
 
 export interface MessagesProps {
     session: Session | null;

@@ -2,19 +2,19 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import {SignIn} from './SignIn';
-import {Session} from 'next-auth';
-import {Button} from '@/components/ui/button';
-import {signOut} from 'next-auth/react';
-import {Menu, MessageCircle, X} from 'lucide-react';
-import {useState} from 'react';
+import { SignIn } from './SignIn';
+import { Session } from 'next-auth';
+import { Button } from '@/components/ui/button';
+import { signOut } from 'next-auth/react';
+import { Menu, MessageCircle, X } from 'lucide-react';
+import { useState } from 'react';
 import Register from '@/components/Register';
 
 interface NavbarProps {
     session: Session | null;
 }
 
-const Navbar = ({session}: NavbarProps) => {
+const Navbar = ({ session }: NavbarProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
@@ -22,13 +22,15 @@ const Navbar = ({session}: NavbarProps) => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="container mx-auto px-4 py-6 flex justify-between items-center">
                     <div className="flex items-center space-x-3">
-                        <Link href="/"
-                              onClick={() => {
-                                  if (isMenuOpen) {
-                                      setIsMenuOpen(!isMenuOpen);
-                                  }
-                              }}
-                              className="flex items-center space-x-3 rounded-md">
+                        <Link
+                            href="/"
+                            onClick={() => {
+                                if (isMenuOpen) {
+                                    setIsMenuOpen(!isMenuOpen);
+                                }
+                            }}
+                            className="flex items-center space-x-3 rounded-md"
+                        >
                             <div className="relative w-8 sm:w-10 h-8 sm:h-10">
                                 <Image
                                     src="/bgmLogo-s.png"
@@ -39,9 +41,9 @@ const Navbar = ({session}: NavbarProps) => {
                                 />
                             </div>
                             <span className="text-xl sm:text-2xl font-bold">
-                <span className="text-teal-500">Board</span>Game
-                <span className="font-light">Match</span>
-              </span>
+                                <span className="text-teal-500">Board</span>Game
+                                <span className="font-light">Match</span>
+                            </span>
                         </Link>
                     </div>
 
@@ -51,9 +53,9 @@ const Navbar = ({session}: NavbarProps) => {
                         className="md:hidden p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700"
                     >
                         {isMenuOpen ? (
-                            <X className="h-6 w-6"/>
+                            <X className="h-6 w-6" />
                         ) : (
-                            <Menu className="h-6 w-6"/>
+                            <Menu className="h-6 w-6" />
                         )}
                     </button>
 
@@ -61,27 +63,36 @@ const Navbar = ({session}: NavbarProps) => {
                     <nav className="hidden md:block">
                         <ul className="flex space-x-4 items-center">
                             <li>
-                                <Link href="#match" className="hover:text-teal-400 transition-colors">
+                                <Link
+                                    href="#match"
+                                    className="hover:text-teal-400 transition-colors"
+                                >
                                     Match
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="hover:text-teal-400 transition-colors">
+                                <Link
+                                    href="#"
+                                    className="hover:text-teal-400 transition-colors"
+                                >
                                     About
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="hover:text-teal-400 transition-colors">
+                                <Link
+                                    href="#"
+                                    className="hover:text-teal-400 transition-colors"
+                                >
                                     Contact
                                 </Link>
                             </li>
                             {!session ? (
                                 <>
                                     <li>
-                                        <SignIn/>
+                                        <SignIn />
                                     </li>
                                     <li>
-                                        <Register/>
+                                        <Register />
                                     </li>
                                 </>
                             ) : (
@@ -99,7 +110,9 @@ const Navbar = ({session}: NavbarProps) => {
                                             variant="outline"
                                             size="sm"
                                             className="text-teal-400 border-teal-400 hover:bg-teal-400/10"
-                                            onClick={() => signOut({callbackUrl: '/'})}
+                                            onClick={() =>
+                                                signOut({ callbackUrl: '/' })
+                                            }
                                         >
                                             Sign Out
                                         </Button>
@@ -112,8 +125,11 @@ const Navbar = ({session}: NavbarProps) => {
                                     size="sm"
                                     className="bg-teal-500/10 text-teal-400 border-teal-400 hover:bg-teal-500/20 font-medium"
                                 >
-                                    <Link href="/chat" className="flex items-center space-x-2">
-                                        <MessageCircle className="h-4 w-4"/>
+                                    <Link
+                                        href="/chat"
+                                        className="flex items-center space-x-2"
+                                    >
+                                        <MessageCircle className="h-4 w-4" />
                                         <span>Chat</span>
                                     </Link>
                                 </Button>
@@ -124,31 +140,39 @@ const Navbar = ({session}: NavbarProps) => {
 
                 {/* Mobile navigation */}
                 {isMenuOpen && (
-                    <nav
-                        className="md:hidden absolute inset-x-0 bg-gray-900 pb-4 flex flex-col items-center justify-center space-y-4 transition-transform duration-200 ease-in-out z-50">
+                    <nav className="md:hidden absolute inset-x-0 bg-gray-900 pb-4 flex flex-col items-center justify-center space-y-4 transition-transform duration-200 ease-in-out z-50">
                         <ul className="flex flex-col space-y-4 items-center justify-center px-6">
                             <li>
-                                <Link href="#match" className="block hover:text-teal-400 transition-colors">
+                                <Link
+                                    href="#match"
+                                    className="block hover:text-teal-400 transition-colors"
+                                >
                                     Match
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="block hover:text-teal-400 transition-colors">
+                                <Link
+                                    href="#"
+                                    className="block hover:text-teal-400 transition-colors"
+                                >
                                     About
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="block hover:text-teal-400 transition-colors">
+                                <Link
+                                    href="#"
+                                    className="block hover:text-teal-400 transition-colors"
+                                >
                                     Contact
                                 </Link>
                             </li>
                             {!session ? (
                                 <>
                                     <li>
-                                        <SignIn/>
+                                        <SignIn />
                                     </li>
                                     <li>
-                                        <Register/>
+                                        <Register />
                                     </li>
                                 </>
                             ) : (
@@ -156,7 +180,9 @@ const Navbar = ({session}: NavbarProps) => {
                                     <li>
                                         <Link
                                             href="/profile"
-                                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                            onClick={() =>
+                                                setIsMenuOpen(!isMenuOpen)
+                                            }
                                             className="block hover:text-teal-400 transition-colors"
                                         >
                                             Profile
@@ -167,7 +193,9 @@ const Navbar = ({session}: NavbarProps) => {
                                             variant="outline"
                                             size="sm"
                                             className="w-full text-teal-400 border-teal-400 hover:bg-teal-400/10"
-                                            onClick={() => signOut({callbackUrl: '/'})}
+                                            onClick={() =>
+                                                signOut({ callbackUrl: '/' })
+                                            }
                                         >
                                             Sign Out
                                         </Button>
@@ -180,10 +208,14 @@ const Navbar = ({session}: NavbarProps) => {
                                     size="sm"
                                     className="w-full bg-teal-500/10 text-teal-400 border-teal-400 hover:bg-teal-500/20 font-medium"
                                 >
-                                    <Link href="/chat"
-                                          onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                          className="flex items-center justify-center space-x-2">
-                                        <MessageCircle className="h-4 w-4"/>
+                                    <Link
+                                        href="/chat"
+                                        onClick={() =>
+                                            setIsMenuOpen(!isMenuOpen)
+                                        }
+                                        className="flex items-center justify-center space-x-2"
+                                    >
+                                        <MessageCircle className="h-4 w-4" />
                                         <span>Chat</span>
                                     </Link>
                                 </Button>
@@ -197,4 +229,3 @@ const Navbar = ({session}: NavbarProps) => {
 };
 
 export default Navbar;
-
