@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -23,6 +23,5 @@ const connectDB = async (uri = process.env.MONGODB_URI) => {
         process.exit(1);
     }
 };
-
 
 export default connectDB;
