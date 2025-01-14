@@ -1,7 +1,5 @@
 import type {Metadata} from 'next';
 import './globals.css';
-import {GeistSans} from 'geist/font/sans';
-import {GeistMono} from 'geist/font/mono';
 
 import NavbarWrapper from '@/components/NavbarWrapper';
 
@@ -18,7 +16,7 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body
-            className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
+            className={'antialiased'}
         >
         <NavbarWrapper/>
         {children}
