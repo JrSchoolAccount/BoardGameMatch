@@ -1,4 +1,4 @@
-import {differenceInMinutes, format, isToday, isYesterday} from 'date-fns';
+import { differenceInMinutes, format, isToday, isYesterday } from 'date-fns';
 
 const FormatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);

@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import {getServerSession} from 'next-auth';
-import {options} from '@/app/api/auth/[...nextauth]/options';
+import { getServerSession } from 'next-auth';
+import { options } from '@/app/api/auth/[...nextauth]/options';
 
 const ProfilePage = async () => {
     const session = await getServerSession(options);
@@ -9,7 +9,9 @@ const ProfilePage = async () => {
         <div className="grid place-items-center">
             <h1>Placeholder profile page</h1>
             <div>
-                {session?.user?.name ? <h2>Hello {session.user.name}!</h2> : null}
+                {session?.user?.name ? (
+                    <h2>Hello {session.user.name}!</h2>
+                ) : null}
 
                 {session?.user?.image ? (
                     <Image
