@@ -24,6 +24,10 @@ const Chat = ({ session }: ChatProps) => {
     }, [messages, isConnected]);
 
     useEffect(() => {
+        if (!socket.connected) {
+            socket.connect();
+        }
+
         const handleConnect = () => {
             setIsConnected(true);
             setIsLoading(false);
@@ -52,7 +56,7 @@ const Chat = ({ session }: ChatProps) => {
 
         socket.on('connect', handleConnect);
         socket.on('disconnect', handleDisconnect);
-        socket.on('profile-history', handleHistory);
+        socket.on('message-history', handleHistory);
         socket.on('message', handleMessage);
 
         return () => {
@@ -61,6 +65,8 @@ const Chat = ({ session }: ChatProps) => {
             socket.off('connect-error', handleConnectError);
             socket.off('message');
             socket.off('profile-history');
+
+            socket.disconnect();
         };
     }, []);
 

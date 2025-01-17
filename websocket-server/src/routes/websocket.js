@@ -24,10 +24,10 @@ class WebSocketServer {
 
             Message.find()
                 .sort({ timestamp: -1 })
-                .limit(50)
+                .limit(1000)
                 .then((messages) => {
                     console.log('Chat history successfully loaded');
-                    socket.emit('profile-history', messages.reverse());
+                    socket.emit('message-history', messages.reverse());
                 });
 
             socket.on('message', async (data) => {
