@@ -7,7 +7,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const { roomId, userId }: RequestBody = await req.json();
         const room = await Room.findByIdAndUpdate(
             roomId,
-            { $addToSet: { participants: userId } },
+            { $pull: { participants: userId } },
             { new: true }
         );
         return new NextResponse(JSON.stringify(room), { status: 200 });
