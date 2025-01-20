@@ -64,7 +64,7 @@ const Chat = ({ session }: ChatProps) => {
             socket.off('disconnect', handleDisconnect);
             socket.off('connect-error', handleConnectError);
             socket.off('message');
-            socket.off('profile-history');
+            socket.off('message-history');
 
             socket.disconnect();
         };

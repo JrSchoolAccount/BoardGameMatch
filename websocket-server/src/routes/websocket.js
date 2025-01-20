@@ -22,24 +22,41 @@ class WebSocketServer {
                 `Total clients connected: ${this.io.engine.clientsCount}`
             );
 
-            Message.find()
-                .sort({ timestamp: -1 })
-                .limit(1000)
-                .then((messages) => {
-                    console.log('Chat history successfully loaded');
+            socket.on('join-room', async (roomId) => {
+                socket.join(roomId);
+                console.log(`Socket ${socket.id} joined room: ${roomId}`);
+
+                const recentMessages = await Message.find({ roomId })
+                    .sort({ timestamp: -1 })
+                    .limit(10);
+                socket.emit('recent-messages', recentMessages.reverse());
+            });
+
+            socket.on('leave-room', (roomId) => {
+                socket.leave(roomId);
+                console.log(`Socket ${socket.id} left room: ${roomId}`);
+            });
+
+            socket.on(
+                'message-history',
+                async (roomId, limit = 50, offset = 0) => {
+                    const messages = await Message.find({ roomId })
+                        .sort({ timestamp: -1 })
+                        .skip(offset)
+                        .limit(limit);
                     socket.emit('message-history', messages.reverse());
-                });
+                }
+            );
 
             socket.on('message', async (data) => {
                 console.log('Message received:', data);
 
-                const newMessage = new Message({
-                    username: data.username,
-                    message: data.message,
-                });
+                const { roomId, username, message } = data;
+
+                const newMessage = new Message({ roomId, username, message });
                 await newMessage.save();
 
-                this.io.emit('message', newMessage);
+                this.io.to(roomId).emit('message', newMessage);
             });
 
             socket.on('disconnect', () => {
