@@ -26,7 +26,7 @@ const ConversationItem = ({
                             className="rounded-full"
                             src="https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027366_960_720.png"
                             alt="avatar"
-                            width={28} // Adjust as per the image's size
+                            width={28}
                             height={28}
                         />
                     </div>

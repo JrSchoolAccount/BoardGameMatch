@@ -4,7 +4,7 @@ import connectDB from '@/config/db';
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
     const userId = req.nextUrl.searchParams.get('userId');
-
+    
     await connectDB();
 
     if (!userId) {
