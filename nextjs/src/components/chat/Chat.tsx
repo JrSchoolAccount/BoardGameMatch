@@ -18,10 +18,10 @@ const Chat = ({ session }: ChatProps) => {
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        if (messages.length == 0 && isConnected) {
-            setIsLoading(true);
+        if (isConnected) {
+            socket.emit('join-room', 'general');
         }
-    }, [messages, isConnected]);
+    }, [isConnected]);
 
     useEffect(() => {
         if (!socket.connected) {
@@ -49,14 +49,14 @@ const Chat = ({ session }: ChatProps) => {
             setIsLoading(false);
         };
 
-        const handleHistory = (history: Message[]) => {
-            setMessages(history);
+        const handleRecentMessages = (recentMessages: Message[]) => {
+            setMessages(recentMessages);
             setIsLoading(false);
         };
 
         socket.on('connect', handleConnect);
         socket.on('disconnect', handleDisconnect);
-        socket.on('message-history', handleHistory);
+        socket.on('recent-messages', handleRecentMessages);
         socket.on('message', handleMessage);
 
         return () => {
@@ -64,7 +64,7 @@ const Chat = ({ session }: ChatProps) => {
             socket.off('disconnect', handleDisconnect);
             socket.off('connect-error', handleConnectError);
             socket.off('message');
-            socket.off('message-history');
+            socket.off('recent-messages');
 
             socket.disconnect();
         };
@@ -73,6 +73,7 @@ const Chat = ({ session }: ChatProps) => {
     const sendMessage = (message: string) => {
         if (message.trim() && session?.user?.name) {
             const newMessage = {
+                roomId: 'general', // This need to be changed to dynamic
                 username: session.user.name,
                 message: message,
                 timestamp: new Date().toISOString(),
