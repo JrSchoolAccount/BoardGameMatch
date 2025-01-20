@@ -1,47 +1,53 @@
-import ConversationItem from '@/components/chat/ConversationItem';
+'use client';
 
-const Conversation = () => {
+import ConversationItem from '@/components/chat/ConversationItem';
+import { useEffect, useState } from 'react';
+import FormatTimestamp from '@/components/chat/FormatTimestamp';
+
+const Conversation = ({ userId }: { userId: string }) => {
     type ConversationData = {
         name: string;
         time: string;
         message: string;
         active?: boolean;
     };
-    const data: ConversationData[] = [
-        {
-            name: 'John Doe',
-            time: 'just now',
-            message: 'Hey there! Are you finish creating the chat app?',
-            active: true,
-        },
-        {
-            name: 'Cherry Ann',
-            time: '12:00',
-            message: 'Hello? Are you available tonight?',
-        },
-        {
-            name: 'Lalaine',
-            time: 'yesterday',
-            message: "I'm thinking of resigning",
-        },
-        { name: 'Princess', time: '1 day ago', message: 'I found a job :)' },
-        {
-            name: 'Charm',
-            time: '1 day ago',
-            message: 'Can you get me some chocolates?',
-        },
-        {
-            name: 'Garen',
-            time: '1 day ago',
-            message: "I'm the bravest of all kind",
-        },
-    ];
+    const [conversations, setConversations] = useState<ConversationData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchConversations = async () => {
+            try {
+                const res = await fetch(`/api/rooms?userId=${userId}`);
+                if (!res.ok) {
+                    throw new Error('Failed to fetch conversations.');
+                }
+
+                const rooms = await res.json();
+
+                const transformedData = rooms.map((room: any) => ({
+                    name: room.name,
+                    time: FormatTimestamp(room.lastMessage?.timestamp),
+                    message: room.lastMessage?.message || 'No messages yet',
+                    active: true, // Implement this later
+                }));
+
+                setConversations(transformedData);
+            } catch (error: any) {
+                setError(error.message || 'An error occurred');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchConversations();
+    }, [userId]);
 
     return (
         <div className="p-1">
-            {data.map((item, index) => (
+            {conversations.map((item, index) => (
                 <ConversationItem
-                    key={index} // Always provide a unique key for mapped items
+                    key={index}
                     message={item.message}
                     time={item.time}
                     name={item.name}

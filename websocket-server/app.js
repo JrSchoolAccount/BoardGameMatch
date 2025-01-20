@@ -1,6 +1,6 @@
 import express from 'express';
 import { createServer } from 'node:http';
-import WebSocketServer from './src/routes/websocket.js';
+import WebSocketServer from './src/socket/websocket.js';
 import connectDB from './src/config/db.js';
 
 const app = express();

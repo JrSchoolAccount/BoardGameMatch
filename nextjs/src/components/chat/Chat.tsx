@@ -17,12 +17,12 @@ const Chat = ({ session }: ChatProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    useEffect(() => {
-        if (isConnected) {
-            socket.emit('join-room', 'general');
-        }
-    }, [isConnected]);
-
+    /* useEffect(() => {
+         if (isConnected) {
+             // socket.emit('join-room', '678e402efcd845760d4bb03c');
+         }
+     }, [isConnected]);
+ */
     useEffect(() => {
         if (!socket.connected) {
             socket.connect();
@@ -73,7 +73,7 @@ const Chat = ({ session }: ChatProps) => {
     const sendMessage = (message: string) => {
         if (message.trim() && session?.user?.name) {
             const newMessage = {
-                roomId: 'general', // This need to be changed to dynamic
+                roomId: '678e402efcd845760d4bb03c', // This need to be changed to dynamic
                 username: session.user.name,
                 message: message,
                 timestamp: new Date().toISOString(),
@@ -117,7 +117,7 @@ const Chat = ({ session }: ChatProps) => {
                     <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
                         Recent
                     </div>
-                    <Conversation />
+                    <Conversation userId="678e3e5240b3facdac2c1b52" />
                 </div>
             </div>
 
