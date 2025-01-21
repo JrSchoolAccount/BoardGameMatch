@@ -17,6 +17,7 @@ const ConversationItem = ({
 
     return (
         <div>
+            {/* Online Users */}
             <div
                 className={`conversation-item p-1 dark:bg-gray-700 hover:bg-gray-200 m-1 rounded-md ${_class}`}
             >
