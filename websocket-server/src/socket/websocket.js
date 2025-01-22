@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
-import Message from '../model/message.js';
+import { Message } from '../model/message.js';
+import { Session } from '../model/session.js';
 
 class WebSocketServer {
     constructor(httpServer) {
@@ -14,16 +15,41 @@ class WebSocketServer {
     }
 
     setupSocketEvents() {
-        this.io.use((socket, next) => {
+        this.io.use(async (socket, next) => {
+            const existingSessionID = socket.handshake.auth.sessionID;
+            if (existingSessionID) {
+                const session = await Session.findOne({
+                    sessionID: existingSessionID,
+                });
+                if (session) {
+                    socket.sessionID = existingSessionID;
+                    socket.userID = session.userID;
+                    socket.username = session.username;
+                    return next();
+                }
+            }
             const username = socket.handshake.auth.username;
             if (!username) {
-                return next(new Error('invalid username'));
+                return next(new Error('Invalid username'));
             }
+            const newSessionID = crypto.randomBytes(8).toString('hex');
+            const userID = crypto.randomBytes(8).toString('hex');
+            socket.sessionID = newSessionID;
+            socket.userID = userID;
             socket.username = username;
+
+            await new Session({
+                sessionID: existingSessionID,
+                userID,
+                username,
+                connected: true,
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            }).save();
+
             next();
         });
 
-        this.io.on('connection', (socket) => {
+        this.io.on('connection', async (socket) => {
             console.log(
                 `Client connected: ${socket.id}, Origin: ${socket.handshake.headers.origin}`
             );
@@ -31,31 +57,13 @@ class WebSocketServer {
                 `Total clients connected: ${this.io.engine.clientsCount}`
             );
 
-            const users = [];
+            const users = await Session.find({});
+            const messages = await Message.find({
+                $or: [{ from: socket.userID }, { to: socket.userID }],
+            });
 
-            for (let [id, socket] of this.io.of('/').sockets) {
-                users.push({
-                    userID: id,
-                    username: socket.username,
-                });
-            }
-            console.log(users);
             socket.emit('users', users);
-
-            socket.on('join-room', async (roomId) => {
-                socket.join(roomId);
-                console.log(`Socket ${socket.id} joined room: ${roomId}`);
-
-                const recentMessages = await Message.find({ roomId })
-                    .sort({ timestamp: -1 })
-                    .limit(10);
-                socket.emit('recent-messages', recentMessages.reverse());
-            });
-
-            socket.on('leave-room', (roomId) => {
-                socket.leave(roomId);
-                console.log(`Socket ${socket.id} left room: ${roomId}`);
-            });
+            socket.emit('messages', messages);
 
             socket.on(
                 'message-history',
