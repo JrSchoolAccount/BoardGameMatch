@@ -14,6 +14,15 @@ class WebSocketServer {
     }
 
     setupSocketEvents() {
+        this.io.use((socket, next) => {
+            const username = socket.handshake.auth.username;
+            if (!username) {
+                return next(new Error('invalid username'));
+            }
+            socket.username = username;
+            next();
+        });
+
         this.io.on('connection', (socket) => {
             console.log(
                 `Client connected: ${socket.id}, Origin: ${socket.handshake.headers.origin}`
@@ -21,6 +30,17 @@ class WebSocketServer {
             console.log(
                 `Total clients connected: ${this.io.engine.clientsCount}`
             );
+
+            const users = [];
+
+            for (let [id, socket] of this.io.of('/').sockets) {
+                users.push({
+                    userID: id,
+                    username: socket.username,
+                });
+            }
+            console.log(users);
+            socket.emit('users', users);
 
             socket.on('join-room', async (roomId) => {
                 socket.join(roomId);

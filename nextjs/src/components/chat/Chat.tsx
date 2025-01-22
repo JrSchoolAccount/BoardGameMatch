@@ -6,7 +6,6 @@ import { Session } from 'next-auth';
 import { useEffect, useState } from 'react';
 import { socket } from '@/app/socket';
 import { Message } from '@/components/chat/models/Message';
-import Image from 'next/image';
 
 interface ChatProps {
     session: Session | null;
@@ -18,8 +17,11 @@ const Chat = ({ session }: ChatProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
+    const userName = session?.user;
+
     useEffect(() => {
-        if (!socket.connected) {
+        if (userName && !socket.connected) {
+            socket.auth = { username: userName };
             socket.connect();
         }
 
@@ -110,43 +112,9 @@ const Chat = ({ session }: ChatProps) => {
                         </div>
                     </div>
                     <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
-                        Chat Rooms:
-                    </div>
-                    {/* General Group Chat */}
-                    <div
-                        className={
-                            'conversation-item p-1 dark:bg-gray-700 hover:bg-gray-200 m-1 rounded-md bg-gray-200'
-                        }
-                    >
-                        <div className="flex items-center p-2 cursor-pointer">
-                            <div className="w-10 h-10 m-1">
-                                <Image
-                                    className="rounded-full"
-                                    src="https://cdn.pixabay.com/photo/2021/02/16/18/55/gamer-6022003_1280.png"
-                                    alt="Public Chat"
-                                    width={38}
-                                    height={38}
-                                />
-                            </div>
-                            <div className="flex-grow p-2">
-                                <div className="flex justify-between text-md">
-                                    <div className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                                        Public
-                                    </div>
-                                    <div className="text-xs text-gray-400 dark:text-gray-300">
-                                        Yesterday 12:03
-                                    </div>
-                                </div>
-                                <div className="text-sm text-gray-500 dark:text-gray-400 w-40 truncate">
-                                    Welcome to the Group Chat!
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
                         Online Users:
                     </div>
-                    <Conversation userId="678e3e5240b3facdac2c1b52" />
+                    <Conversation />
                 </div>
             </div>
 

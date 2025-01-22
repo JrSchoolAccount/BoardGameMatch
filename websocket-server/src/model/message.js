@@ -1,16 +1,10 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-const messageSchema = new mongoose.Schema({
-    roomId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Room',
-        required: true,
-    },
-    username: String,
-    message: String,
+const MessageSchema = new mongoose.Schema({
+    from: String,
+    to: String,
+    content: String,
     timestamp: { type: Date, default: Date.now },
 });
 
-const Message = mongoose.model('Message', messageSchema);
-
-export default Message;
+module.exports = mongoose.model('Message', MessageSchema);

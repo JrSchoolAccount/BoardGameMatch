@@ -37,7 +37,7 @@ const ConversationItem = ({
                                 {name}
                             </div>
                             <div className="text-xs text-gray-400 dark:text-gray-300">
-                                {time}
+                                {time} || Now
                             </div>
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400 w-40 truncate">
