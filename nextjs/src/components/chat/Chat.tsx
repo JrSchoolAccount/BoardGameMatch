@@ -11,18 +11,29 @@ interface ChatProps {
     session: Session | null;
 }
 
+interface SessionData {
+    sessionID: string;
+    userID: string;
+}
+
 const Chat = ({ session }: ChatProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isConnected, setIsConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const userName = session?.user;
+    const userName = session?.user?.name;
 
     useEffect(() => {
-        if (userName && !socket.connected) {
-            socket.auth = { username: userName };
-            socket.connect();
+        if (userName) {
+            socket.auth = {
+                sessionID: userName, // replace with JWT if needed
+                username: userName,
+            };
+
+            if (!socket.connected) {
+                socket.connect();
+            }
         }
 
         const handleConnect = () => {
@@ -53,8 +64,9 @@ const Chat = ({ session }: ChatProps) => {
 
         socket.on('connect', handleConnect);
         socket.on('disconnect', handleDisconnect);
-        socket.on('recent-messages', handleRecentMessages);
         socket.on('message', handleMessage);
+        socket.on('recent-messages', handleRecentMessages);
+        socket.on('connect_error', handleConnectError);
 
         return () => {
             socket.off('connect', handleConnect);
@@ -64,6 +76,20 @@ const Chat = ({ session }: ChatProps) => {
             socket.off('recent-messages');
 
             socket.disconnect();
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            if (socket.connected) {
+                socket.disconnect();
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, []);
 

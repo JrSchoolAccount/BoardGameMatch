@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { Message } from '../model/message.js';
 import { Session } from '../model/session.js';
+import crypto from 'crypto';
 
 class WebSocketServer {
     constructor(httpServer) {
@@ -23,7 +24,7 @@ class WebSocketServer {
                 });
                 if (session) {
                     socket.sessionID = existingSessionID;
-                    socket.userID = session.userID;
+                    socket.userID = session.username;
                     socket.username = session.username;
                     return next();
                 }
@@ -32,10 +33,10 @@ class WebSocketServer {
             if (!username) {
                 return next(new Error('Invalid username'));
             }
-            const newSessionID = crypto.randomBytes(8).toString('hex');
+            const newSessionID = username;
             const userID = crypto.randomBytes(8).toString('hex');
             socket.sessionID = newSessionID;
-            socket.userID = userID;
+            socket.userID = username;
             socket.username = username;
 
             await new Session({
@@ -51,30 +52,70 @@ class WebSocketServer {
 
         this.io.on('connection', async (socket) => {
             console.log(
-                `Client connected: ${socket.id}, Origin: ${socket.handshake.headers.origin}`
+                `Client connected: ${socket.id}, Origin: ${socket.handshake.headers.origin}, username: ${socket.handshake.auth.username}`
             );
             console.log(
                 `Total clients connected: ${this.io.engine.clientsCount}`
             );
 
-            const users = await Session.find({});
+            await Session.findOneAndUpdate(
+                { sessionID: socket.sessionID },
+                {
+                    sessionID: socket.sessionID,
+                    userID: socket.userID,
+                    username: socket.username,
+                    connected: true,
+                },
+                { upsert: true }
+            );
+
+            socket.emit('session', {
+                sessionID: socket.sessionID,
+                userID: socket.userID,
+            });
+
+            socket.join(socket.userID);
+
+            const sessions = await Session.find({});
             const messages = await Message.find({
                 $or: [{ from: socket.userID }, { to: socket.userID }],
             });
 
-            socket.emit('users', users);
-            socket.emit('messages', messages);
+            const users = sessions.map((session) => {
+                const userMessages = messages.filter(
+                    (message) =>
+                        message.from === session.userID ||
+                        message.to === session.userID
+                );
+                return {
+                    userID: session.userID,
+                    username: session.username,
+                    connected: session.connected,
+                    messages: userMessages,
+                };
+            });
 
-            socket.on(
-                'message-history',
-                async (roomId, limit = 50, offset = 0) => {
-                    const messages = await Message.find({ roomId })
-                        .sort({ timestamp: -1 })
-                        .skip(offset)
-                        .limit(limit);
-                    socket.emit('message-history', messages.reverse());
-                }
-            );
+            socket.emit('users', users);
+
+            socket.broadcast.emit('user connected', {
+                userID: socket.userID,
+                username: socket.username,
+                connected: true,
+                messages: [],
+            });
+
+            socket.on('private message', async ({ content, to }) => {
+                const message = {
+                    content,
+                    from: socket.userID,
+                    to,
+                };
+                await new Message(message).save();
+                socket
+                    .to(to)
+                    .to(socket.userID)
+                    .emit('private message', message);
+            });
 
             socket.on('message', async (data) => {
                 console.log('Message received:', data);
@@ -87,8 +128,13 @@ class WebSocketServer {
                 this.io.to(roomId).emit('message', newMessage);
             });
 
-            socket.on('disconnect', () => {
-                console.log(`Client disconnected: ${socket.id}`);
+            socket.on('disconnect', async () => {
+                socket.broadcast.emit('user disconnected', socket.userID);
+
+                await Session.findOneAndUpdate(
+                    { sessionID: socket.sessionID },
+                    { connected: false }
+                );
             });
         });
     }
