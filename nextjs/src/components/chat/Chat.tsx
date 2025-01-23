@@ -21,6 +21,7 @@ const Chat = ({ session }: ChatProps) => {
     const [isConnected, setIsConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [currentConversation, setCurrentConversation] = useState<string>('');
 
     const username = session?.user?.name;
 
@@ -104,11 +105,15 @@ const Chat = ({ session }: ChatProps) => {
         };
     }, []);
 
+    const handleConversationClick = (userID: string) => {
+        setCurrentConversation(userID);
+    };
+
     const sendMessage = (message: string) => {
-        if (message.trim() && username) {
+        if (message.trim() && username && currentConversation) {
             const newMessage = {
                 from: username,
-                to: 'Gubbalur',
+                to: currentConversation,
                 content: message,
                 timestamp: new Date().toISOString(),
             };
@@ -151,7 +156,11 @@ const Chat = ({ session }: ChatProps) => {
                     <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
                         Online Users:
                     </div>
-                    <Conversation username={username} />
+                    <Conversation
+                        username={username}
+                        conversationId={currentConversation}
+                        onConversationClick={handleConversationClick}
+                    />
                 </div>
             </div>
 
@@ -164,7 +173,7 @@ const Chat = ({ session }: ChatProps) => {
                     isConnected={isConnected}
                     errorMessage={errorMessage}
                     sendMessage={sendMessage}
-                    conversationID={'Gubbalur'}
+                    currentConversation={currentConversation}
                 />
             </div>
         </div>

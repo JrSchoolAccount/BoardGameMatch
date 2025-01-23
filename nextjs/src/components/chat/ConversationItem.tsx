@@ -1,25 +1,30 @@
 import Image from 'next/image';
 
 interface ConversationItemProps {
+    status: boolean;
     active: boolean;
     time: string;
     name: string;
     lastMessage: string;
+    onClick: () => void;
 }
 
 const ConversationItem = ({
-    active,
+    status,
     time,
     name,
     lastMessage,
+    onClick,
+    active,
 }: ConversationItemProps) => {
-    const _class = active ? 'bg-gray-200' : 'bg-white';
+    const activeConversation = active ? 'bg-gray-900' : 'bg-gray-200';
 
     return (
         <div>
             {/* Users */}
             <div
-                className={`conversation-item p-1 dark:bg-gray-700 hover:bg-gray-900 m-1 rounded-md ${_class}`}
+                className={`conversation-item p-1 dark:bg-gray-700 hover:bg-gray-900 m-1 rounded-md ${activeConversation}`}
+                onClick={onClick}
             >
                 <div className="flex items-center p-2 cursor-pointer">
                     <div className="relative w-7 h-7 m-1">
@@ -32,7 +37,7 @@ const ConversationItem = ({
                         />
                         <div
                             className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-700 ${
-                                active ? 'bg-green-500' : 'bg-red-500'
+                                status ? 'bg-green-500' : 'bg-red-500'
                             }`}
                         ></div>
                     </div>

@@ -17,7 +17,7 @@ const Messages = ({
     isConnected,
     errorMessage,
     sendMessage,
-    conversationID,
+    currentConversation,
 }: MessagesProps) => {
     const [message, setMessage] = useState<string>('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);

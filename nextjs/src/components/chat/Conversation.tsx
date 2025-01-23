@@ -7,10 +7,16 @@ import { User } from '@/components/chat/models/User';
 import FormatTimestamp from '@/components/chat/FormatTimestamp';
 
 interface ConversationProps {
-    username: string | null | undefined; // Accept null or undefined
+    username: string | null | undefined;
+    onConversationClick: (userID: string) => void;
+    conversationId: string;
 }
 
-const Conversation = ({ username }: ConversationProps) => {
+const Conversation = ({
+    username,
+    conversationId,
+    onConversationClick,
+}: ConversationProps) => {
     const [users, setUsers] = useState<User[]>([]);
 
     const currentUser = username;
@@ -67,7 +73,9 @@ const Conversation = ({ username }: ConversationProps) => {
                         lastMessage={item.lastMessage.content}
                         time={FormatTimestamp(item.lastMessage.timestamp)}
                         name={item.username}
-                        active={item.connected}
+                        status={item.connected}
+                        active={conversationId === item.username}
+                        onClick={() => onConversationClick(item.username)}
                     />
                 ))}
         </div>
