@@ -36,11 +36,11 @@ class WebSocketServer {
             const newSessionID = username;
             const userID = crypto.randomBytes(8).toString('hex');
             socket.sessionID = newSessionID;
-            socket.userID = username;
+            socket.userID = userID;
             socket.username = username;
 
             await new Session({
-                sessionID: existingSessionID,
+                sessionID: newSessionID,
                 userID,
                 username,
                 connected: true,
@@ -57,6 +57,24 @@ class WebSocketServer {
             console.log(
                 `Total clients connected: ${this.io.engine.clientsCount}`
             );
+
+            const sendRecentMessages = async () => {
+                try {
+                    const recentMessages = await Message.find({
+                        $or: [{ from: socket.userID }, { to: socket.userID }],
+                    })
+                        .sort({ timestamp: -1 })
+                        .limit(100);
+
+                    console.log('Sending recent messages to:', socket.userID);
+                    socket.emit('recent-messages', recentMessages);
+                } catch (error) {
+                    console.error('Error fetching recent messages:', error);
+                    socket.emit('error', {
+                        message: 'Failed to fetch recent messages.',
+                    });
+                }
+            };
 
             await Session.findOneAndUpdate(
                 { sessionID: socket.sessionID },
@@ -76,22 +94,17 @@ class WebSocketServer {
 
             socket.join(socket.userID);
 
+            if (socket.userID) {
+                await sendRecentMessages();
+            }
+
             const sessions = await Session.find({});
-            const messages = await Message.find({
-                $or: [{ from: socket.userID }, { to: socket.userID }],
-            });
 
             const users = sessions.map((session) => {
-                const userMessages = messages.filter(
-                    (message) =>
-                        message.from === session.userID ||
-                        message.to === session.userID
-                );
                 return {
                     userID: session.userID,
                     username: session.username,
                     connected: session.connected,
-                    messages: userMessages,
                 };
             });
 
@@ -104,28 +117,16 @@ class WebSocketServer {
                 messages: [],
             });
 
-            socket.on('private message', async ({ content, to }) => {
+            socket.on('private message', async ({ content, to, timestamp }) => {
                 const message = {
                     content,
                     from: socket.userID,
                     to,
+                    timestamp,
                 };
                 await new Message(message).save();
-                socket
-                    .to(to)
-                    .to(socket.userID)
-                    .emit('private message', message);
-            });
-
-            socket.on('message', async (data) => {
-                console.log('Message received:', data);
-
-                const { roomId, username, message } = data;
-
-                const newMessage = new Message({ roomId, username, message });
-                await newMessage.save();
-
-                this.io.to(roomId).emit('message', newMessage);
+                socket.to(to).emit('private message', message);
+                socket.emit('private message', message);
             });
 
             socket.on('disconnect', async () => {

@@ -1,6 +1,6 @@
 export interface Message {
-    roomId: string;
-    username: string;
-    message: string;
+    from: String;
+    to: String;
+    content: String;
     timestamp: string;
 }

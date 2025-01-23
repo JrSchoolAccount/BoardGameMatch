@@ -22,18 +22,19 @@ const Chat = ({ session }: ChatProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const userName = session?.user?.name;
+    const username = session?.user?.name;
 
     useEffect(() => {
-        if (userName) {
+        if (username) {
             socket.auth = {
-                sessionID: userName, // replace with JWT if needed
-                username: userName,
+                sessionID: username, // replace with JWT if needed
+                username: username,
             };
 
             if (!socket.connected) {
                 socket.connect();
             }
+            socket.emit('recent-messages');
         }
 
         const handleConnect = () => {
@@ -58,13 +59,23 @@ const Chat = ({ session }: ChatProps) => {
         };
 
         const handleRecentMessages = (recentMessages: Message[]) => {
-            setMessages(recentMessages);
+            setMessages((prevMessages) => {
+                const combinedMessages = [...prevMessages, ...recentMessages];
+                return Array.from(
+                    new Map(
+                        combinedMessages.map((msg) => [
+                            `${msg.from}-${msg.to}-${msg.timestamp}`,
+                            msg,
+                        ])
+                    ).values()
+                );
+            });
             setIsLoading(false);
         };
 
         socket.on('connect', handleConnect);
         socket.on('disconnect', handleDisconnect);
-        socket.on('message', handleMessage);
+        socket.on('private message', handleMessage);
         socket.on('recent-messages', handleRecentMessages);
         socket.on('connect_error', handleConnectError);
 
@@ -72,12 +83,12 @@ const Chat = ({ session }: ChatProps) => {
             socket.off('connect', handleConnect);
             socket.off('disconnect', handleDisconnect);
             socket.off('connect-error', handleConnectError);
-            socket.off('message');
-            socket.off('recent-messages');
+            socket.off('private message', handleMessage);
+            socket.off('recent-messages', handleRecentMessages);
 
             socket.disconnect();
         };
-    }, []);
+    }, [username]);
 
     useEffect(() => {
         const handleBeforeUnload = () => {
@@ -94,15 +105,15 @@ const Chat = ({ session }: ChatProps) => {
     }, []);
 
     const sendMessage = (message: string) => {
-        if (message.trim() && session?.user?.name) {
+        if (message.trim() && username) {
             const newMessage = {
-                roomId: '678e402efcd845760d4bb03c', // This need to be changed to dynamic
-                username: session.user.name,
-                message: message,
+                from: username,
+                to: 'Gubbalur',
+                content: message,
                 timestamp: new Date().toISOString(),
             };
 
-            socket.emit('message', newMessage);
+            socket.emit('private message', newMessage);
         }
     };
 
@@ -140,7 +151,7 @@ const Chat = ({ session }: ChatProps) => {
                     <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
                         Online Users:
                     </div>
-                    <Conversation />
+                    <Conversation username={username} />
                 </div>
             </div>
 
@@ -153,6 +164,7 @@ const Chat = ({ session }: ChatProps) => {
                     isConnected={isConnected}
                     errorMessage={errorMessage}
                     sendMessage={sendMessage}
+                    conversationID={'Gubbalur'}
                 />
             </div>
         </div>

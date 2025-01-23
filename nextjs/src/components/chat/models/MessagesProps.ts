@@ -8,4 +8,5 @@ export interface MessagesProps {
     isLoading: boolean;
     isConnected: boolean;
     errorMessage: string;
+    conversationID: string;
 }

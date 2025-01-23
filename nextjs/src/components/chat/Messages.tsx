@@ -17,6 +17,7 @@ const Messages = ({
     isConnected,
     errorMessage,
     sendMessage,
+    conversationID,
 }: MessagesProps) => {
     const [message, setMessage] = useState<string>('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -159,18 +160,19 @@ const Messages = ({
                     {messages.map((msg, index) => (
                         <div
                             key={index}
-                            className={`flex ${msg.username === session?.user?.name ? 'justify-end' : 'justify-start'} w-full`}
+                            className={`flex ${msg.from === session?.user?.name ? 'justify-end' : 'justify-start'} w-full`}
                         >
                             <div
-                                className={`p-3 mb-2 max-w-sm w-auto rounded-2xl ${msg.username === session?.user?.name ? 'bg-purple-500 dark:bg-gray-800' : 'bg-purple-300 dark:bg-gray-700'}`}
+                                className={`p-3 mb-2 max-w-sm w-auto rounded-2xl ${msg.from === session?.user?.name ? 'bg-purple-500 dark:bg-gray-800' : 'bg-purple-300 dark:bg-gray-700'}`}
                             >
+                                {/* Username */}
                                 <div className="text-xs text-gray-600 dark:text-gray-200">
-                                    {msg.username}
+                                    {msg.from}
                                 </div>
                                 <div className="group relative">
                                     {/* Message Content */}
                                     <div className="text-gray-700 dark:text-gray-200">
-                                        {msg.message}
+                                        {msg.content}
                                     </div>
 
                                     {/* Timestamp */}
