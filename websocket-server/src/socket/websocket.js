@@ -67,7 +67,10 @@ class WebSocketServer {
                         .limit(100);
 
                     console.log('Sending recent messages to:', socket.userID);
-                    socket.emit('recent-messages', recentMessages);
+                    socket.emit(
+                        'recent-messages',
+                        [...recentMessages].reverse()
+                    );
                 } catch (error) {
                     console.error('Error fetching recent messages:', error);
                     socket.emit('error', {
@@ -98,17 +101,52 @@ class WebSocketServer {
                 await sendRecentMessages();
             }
 
-            const sessions = await Session.find({});
+            const usersWithLastMessage = await Message.aggregate([
+                {
+                    $match: {
+                        $or: [{ from: socket.userID }, { to: socket.userID }],
+                    },
+                },
+                {
+                    $sort: { timestamp: -1 },
+                },
+                {
+                    $group: {
+                        _id: {
+                            $cond: [
+                                { $eq: ['$from', socket.userID] },
+                                '$to',
+                                '$from',
+                            ],
+                        },
+                        lastMessage: { $first: '$$ROOT' }, // Get the most recent message
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'sessions',
+                        localField: '_id',
+                        foreignField: 'userID',
+                        as: 'sessionInfo',
+                    },
+                },
+                {
+                    $unwind: '$sessionInfo',
+                },
+                {
+                    $project: {
+                        userID: '$_id',
+                        username: '$sessionInfo.username',
+                        connected: '$sessionInfo.connected',
+                        lastMessage: 1,
+                        timestamp: '$lastMessage.timestamp',
+                    },
+                },
+            ]);
 
-            const users = sessions.map((session) => {
-                return {
-                    userID: session.userID,
-                    username: session.username,
-                    connected: session.connected,
-                };
-            });
+            socket.emit('users', usersWithLastMessage);
 
-            socket.emit('users', users);
+            socket.emit('users', usersWithLastMessage);
 
             socket.broadcast.emit('user connected', {
                 userID: socket.userID,

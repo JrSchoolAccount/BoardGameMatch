@@ -4,6 +4,7 @@ import ConversationItem from '@/components/chat/ConversationItem';
 import { useEffect, useState } from 'react';
 import { socket } from '@/app/socket';
 import { User } from '@/components/chat/models/User';
+import FormatTimestamp from '@/components/chat/FormatTimestamp';
 
 interface ConversationProps {
     username: string | null | undefined; // Accept null or undefined
@@ -63,8 +64,8 @@ const Conversation = ({ username }: ConversationProps) => {
                 .map((item, index) => (
                     <ConversationItem
                         key={index}
-                        lastMessage={'item.lastMessage'}
-                        time={'item.time'}
+                        lastMessage={item.lastMessage.content}
+                        time={FormatTimestamp(item.lastMessage.timestamp)}
                         name={item.username}
                         active={item.connected}
                     />

@@ -19,7 +19,7 @@ const ConversationItem = ({
         <div>
             {/* Users */}
             <div
-                className={`conversation-item p-1 dark:bg-gray-700 hover:bg-gray-200 m-1 rounded-md ${_class}`}
+                className={`conversation-item p-1 dark:bg-gray-700 hover:bg-gray-900 m-1 rounded-md ${_class}`}
             >
                 <div className="flex items-center p-2 cursor-pointer">
                     <div className="relative w-7 h-7 m-1">
