@@ -1,6 +1,6 @@
 export interface Message {
-    from: String;
-    to: String;
-    content: String;
-    timestamp: String;
+    from: string;
+    to: string;
+    content: string;
+    timestamp: string;
 }

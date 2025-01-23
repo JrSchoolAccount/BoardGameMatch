@@ -9,4 +9,5 @@ export interface MessagesProps {
     isConnected: boolean;
     errorMessage: string;
     currentConversation: string;
+    currentConversationStatus: boolean;
 }

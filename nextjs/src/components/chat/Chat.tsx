@@ -1,27 +1,24 @@
 'use client';
 
 import Conversation from '@/components/chat/Conversation';
-import Messages from '@/components/chat/Messages';
 import { Session } from 'next-auth';
 import { useEffect, useState } from 'react';
 import { socket } from '@/app/socket';
 import { Message } from '@/components/chat/models/Message';
+import Messages from '@/components/chat/Messages';
 
 interface ChatProps {
     session: Session | null;
 }
 
-interface SessionData {
-    sessionID: string;
-    userID: string;
-}
-
 const Chat = ({ session }: ChatProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isConnected, setIsConnected] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [currentConversation, setCurrentConversation] = useState<string>('');
+    const [currentConversationStatus, setCurrentConversationStatus] =
+        useState(false);
 
     const username = session?.user?.name;
 
@@ -157,6 +154,9 @@ const Chat = ({ session }: ChatProps) => {
                         username={username}
                         conversationId={currentConversation}
                         onConversationClick={handleConversationClick}
+                        setCurrentConversationStatus={
+                            setCurrentConversationStatus
+                        }
                     />
                 </div>
             </div>
@@ -171,6 +171,7 @@ const Chat = ({ session }: ChatProps) => {
                     errorMessage={errorMessage}
                     sendMessage={sendMessage}
                     currentConversation={currentConversation}
+                    currentConversationStatus={currentConversationStatus}
                 />
             </div>
         </div>

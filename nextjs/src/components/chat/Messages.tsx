@@ -18,6 +18,7 @@ const Messages = ({
     errorMessage,
     sendMessage,
     currentConversation,
+    currentConversationStatus,
 }: MessagesProps) => {
     const [message, setMessage] = useState<string>('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -31,7 +32,7 @@ const Messages = ({
             chatContainerRef.current.scrollTop =
                 chatContainerRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, currentConversation]);
 
     const handleSendMessage = () => {
         if (message.trim()) {
@@ -83,12 +84,16 @@ const Messages = ({
                     {/* User Info */}
                     <div className="flex-grow p-2">
                         <div className="text-md text-gray-50 font-semibold">
-                            John Doe
+                            {currentConversation}
                         </div>
                         <div className="flex items-center">
-                            <div className="w-2 h-2 bg-green-300 rounded-full"></div>
+                            <div
+                                className={`w-2 h-2 ${currentConversationStatus ? 'bg-green-300' : 'bg-red-500'} rounded-full`}
+                            ></div>
                             <div className="text-xs text-gray-50 ml-1">
-                                Online
+                                {currentConversationStatus
+                                    ? 'Online'
+                                    : 'Offline'}
                             </div>
                         </div>
                     </div>
@@ -157,32 +162,40 @@ const Messages = ({
                 )}
                 {/* Messages Section */}
                 <div className="flex flex-col items-start space-y-2">
-                    {messages.map((msg, index) => (
-                        <div
-                            key={index}
-                            className={`flex ${msg.from === session?.user?.name ? 'justify-end' : 'justify-start'} w-full`}
-                        >
+                    {messages
+                        .filter(
+                            (msg) =>
+                                (msg.from === session?.user?.name &&
+                                    msg.to === currentConversation) ||
+                                (msg.from === currentConversation &&
+                                    msg.to === session?.user?.name)
+                        )
+                        .map((msg, index) => (
                             <div
-                                className={`p-3 mb-2 max-w-sm w-auto rounded-2xl ${msg.from === session?.user?.name ? 'bg-purple-500 dark:bg-gray-800' : 'bg-purple-300 dark:bg-gray-700'}`}
+                                key={index}
+                                className={`flex ${msg.from === session?.user?.name ? 'justify-end' : 'justify-start'} w-full`}
                             >
-                                {/* Username */}
-                                <div className="text-xs text-gray-600 dark:text-gray-200">
-                                    {msg.from}
-                                </div>
-                                <div className="group relative">
-                                    {/* Message Content */}
-                                    <div className="text-gray-700 dark:text-gray-200">
-                                        {msg.content}
+                                <div
+                                    className={`p-3 mb-2 max-w-sm w-auto rounded-2xl ${msg.from === session?.user?.name ? 'bg-purple-500 dark:bg-gray-800' : 'bg-purple-300 dark:bg-gray-700'}`}
+                                >
+                                    {/* Username */}
+                                    <div className="text-xs text-gray-600 dark:text-gray-200">
+                                        {msg.from}
                                     </div>
+                                    <div className="group relative">
+                                        {/* Message Content */}
+                                        <div className="text-gray-700 dark:text-gray-200">
+                                            {msg.content}
+                                        </div>
 
-                                    {/* Timestamp */}
-                                    <div className="absolute -bottom-7 left-0 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        {FormatTimestamp(msg.timestamp)}
+                                        {/* Timestamp */}
+                                        <div className="absolute -bottom-7 left-0 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {FormatTimestamp(msg.timestamp)}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </div>
 

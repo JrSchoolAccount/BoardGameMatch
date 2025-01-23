@@ -37,7 +37,7 @@ const ConversationItem = ({
                         />
                         <div
                             className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-700 ${
-                                status ? 'bg-green-500' : 'bg-red-500'
+                                status ? 'bg-green-300' : 'bg-red-500'
                             }`}
                         ></div>
                     </div>

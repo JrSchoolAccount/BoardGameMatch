@@ -10,16 +10,25 @@ interface ConversationProps {
     username: string | null | undefined;
     onConversationClick: (userID: string) => void;
     conversationId: string;
+    setCurrentConversationStatus: (status: boolean) => void;
 }
 
 const Conversation = ({
     username,
     conversationId,
     onConversationClick,
+    setCurrentConversationStatus,
 }: ConversationProps) => {
     const [users, setUsers] = useState<User[]>([]);
 
     const currentUser = username;
+
+    useEffect(() => {
+        const currentUser = users.find(
+            (user) => user.username === conversationId
+        );
+        setCurrentConversationStatus(currentUser?.connected ?? false);
+    }, [conversationId, users]);
 
     useEffect(() => {
         const handleUsers = (userList: User[]) => {
