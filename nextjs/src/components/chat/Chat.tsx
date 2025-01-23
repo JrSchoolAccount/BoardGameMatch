@@ -153,9 +153,6 @@ const Chat = ({ session }: ChatProps) => {
                             </svg>
                         </div>
                     </div>
-                    <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
-                        Online Users:
-                    </div>
                     <Conversation
                         username={username}
                         conversationId={currentConversation}

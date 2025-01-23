@@ -63,21 +63,55 @@ const Conversation = ({
         };
     }, []);
 
+    const onlineUsers = users.filter(
+        (item) => item.connected && item.username !== currentUser
+    );
+    const offlineUsers = users.filter(
+        (item) => !item.connected && item.username !== currentUser
+    );
+
     return (
-        <div className="p-1">
-            {users
-                .filter((item) => item.username !== currentUser)
-                .map((item, index) => (
+        <div>
+            <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
+                Online Users:
+            </div>
+            <div className="p-1">
+                {onlineUsers.map((item, index) => (
                     <ConversationItem
                         key={index}
-                        lastMessage={item.lastMessage.content}
-                        time={FormatTimestamp(item.lastMessage.timestamp)}
+                        lastMessage={item.lastMessage?.content || 'New User'}
+                        time={
+                            item.lastMessage?.timestamp
+                                ? FormatTimestamp(item.lastMessage.timestamp)
+                                : '13:37'
+                        }
                         name={item.username}
                         status={item.connected}
                         active={conversationId === item.username}
                         onClick={() => onConversationClick(item.username)}
                     />
                 ))}
+            </div>
+            <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
+                Offline Users:
+            </div>
+            <div className="p-1">
+                {offlineUsers.map((item, index) => (
+                    <ConversationItem
+                        key={index}
+                        lastMessage={item.lastMessage?.content || 'New User'}
+                        time={
+                            item.lastMessage?.timestamp
+                                ? FormatTimestamp(item.lastMessage.timestamp)
+                                : '13:37'
+                        }
+                        name={item.username}
+                        status={item.connected}
+                        active={conversationId === item.username}
+                        onClick={() => onConversationClick(item.username)}
+                    />
+                ))}
+            </div>
         </div>
     );
 };

@@ -101,50 +101,43 @@ class WebSocketServer {
                 await sendRecentMessages();
             }
 
-            const usersWithLastMessage = await Message.aggregate([
-                {
-                    $match: {
-                        $or: [{ from: socket.userID }, { to: socket.userID }],
-                    },
-                },
-                {
-                    $sort: { timestamp: -1 },
-                },
-                {
-                    $group: {
-                        _id: {
-                            $cond: [
-                                { $eq: ['$from', socket.userID] },
-                                '$to',
-                                '$from',
-                            ],
-                        },
-                        lastMessage: { $first: '$$ROOT' }, // Get the most recent message
-                    },
-                },
+            const usersWithLastMessage = await Session.aggregate([
                 {
                     $lookup: {
-                        from: 'sessions',
-                        localField: '_id',
-                        foreignField: 'userID',
-                        as: 'sessionInfo',
+                        from: 'messages',
+                        let: { userID: '$userID' },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $or: [
+                                            { $eq: ['$from', '$$userID'] },
+                                            { $eq: ['$to', '$$userID'] },
+                                        ],
+                                    },
+                                },
+                            },
+                            { $sort: { timestamp: -1 } },
+                            { $limit: 1 }, // Get the latest message
+                        ],
+                        as: 'lastMessage',
                     },
                 },
                 {
-                    $unwind: '$sessionInfo',
+                    $unwind: {
+                        path: '$lastMessage',
+                        preserveNullAndEmptyArrays: true, // Include users without messages
+                    },
                 },
                 {
                     $project: {
-                        userID: '$_id',
-                        username: '$sessionInfo.username',
-                        connected: '$sessionInfo.connected',
-                        lastMessage: 1,
-                        timestamp: '$lastMessage.timestamp',
+                        userID: 1,
+                        username: 1,
+                        connected: 1,
+                        lastMessage: '$lastMessage',
                     },
                 },
             ]);
-
-            socket.emit('users', usersWithLastMessage);
 
             socket.emit('users', usersWithLastMessage);
 
