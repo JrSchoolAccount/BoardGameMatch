@@ -180,7 +180,7 @@ const Messages = ({
                                 >
                                     {/* Username */}
                                     <div className="text-xs text-gray-600 dark:text-gray-200">
-                                        {msg.from}
+                                        {msg.from}:
                                     </div>
                                     <div className="group relative">
                                         {/* Message Content */}
@@ -203,7 +203,7 @@ const Messages = ({
             <div className="h-15 p-3 rounded-xl rounded-tr-none rounded-tl-none bg-gray-100 dark:bg-gray-800">
                 <div className="flex items-center">
                     {/* Emoji Icon */}
-                    <div className="p-2 text-gray-600 dark:text-gray-200 relative">
+                    <div className="p-2 hover:bg-gray-900 text-gray-600 dark:text-gray-200 rounded-full relative">
                         <div role="button" onClick={toggleEmojiPicker}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -248,7 +248,7 @@ const Messages = ({
                         <div
                             role="button"
                             tabIndex={0}
-                            className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 flex justify-center items-center pr-3 text-gray-400 rounded-r-md"
+                            className="bg-gray-100 hover:bg-gray-500 dark:bg-gray-800 dark:text-gray-200 flex justify-center items-center pr-3 text-gray-400 rounded-r-md"
                             onClick={handleSendMessage}
                         >
                             <svg

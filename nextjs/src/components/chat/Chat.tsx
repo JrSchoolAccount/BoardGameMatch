@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { socket } from '@/app/socket';
 import { Message } from '@/components/chat/models/Message';
 import Messages from '@/components/chat/Messages';
+import Welcome from '@/components/chat/Welcome';
 
 interface ChatProps {
     session: Session | null;
@@ -163,16 +164,20 @@ const Chat = ({ session }: ChatProps) => {
 
             {/* Messages */}
             <div className="flex-grow h-screen p-2 rounded-md">
-                <Messages
-                    session={session}
-                    messages={messages}
-                    isLoading={isLoading}
-                    isConnected={isConnected}
-                    errorMessage={errorMessage}
-                    sendMessage={sendMessage}
-                    currentConversation={currentConversation}
-                    currentConversationStatus={currentConversationStatus}
-                />
+                {currentConversation ? (
+                    <Messages
+                        session={session}
+                        messages={messages}
+                        isLoading={isLoading}
+                        isConnected={isConnected}
+                        errorMessage={errorMessage}
+                        sendMessage={sendMessage}
+                        currentConversation={currentConversation}
+                        currentConversationStatus={currentConversationStatus}
+                    />
+                ) : (
+                    <Welcome />
+                )}
             </div>
         </div>
     );
