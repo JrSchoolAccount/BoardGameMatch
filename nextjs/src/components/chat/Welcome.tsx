@@ -2,14 +2,21 @@
 
 import Image from 'next/image';
 
-const Welcome = () => {
+interface WelcomeProps {
+    toggleMobileSidebar: () => void;
+}
+
+const Welcome = ({ toggleMobileSidebar }: WelcomeProps) => {
     return (
         <div className="flex-grow h-full flex flex-col">
             {/* Header Section */}
             <div className="w-full h-15 p-1 bg-purple-600 dark:bg-gray-800 shadow-md rounded-xl rounded-bl-none rounded-br-none">
                 <div className="flex p-2 align-middle items-center">
                     {/* Back Button */}
-                    <div className="p-2 md:hidden rounded-full mr-1 hover:bg-purple-500 text-white">
+                    <div
+                        className="p-2 md:hidden rounded-full mr-1 hover:bg-purple-500 text-white"
+                        onClick={toggleMobileSidebar}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-6 w-6"
@@ -39,7 +46,7 @@ const Welcome = () => {
             {/* Main Content Area */}
             <div className="w-full scroll-auto flex-col flex-grow bg-gray-100 dark:bg-gray-900 my-2 p-2 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="relative w-[500px] h-[300px] mx-auto opacity-75 rounded-xl overflow-hidden">
+                    <div className="relative w-[500px] h-[300px] mx-auto opacity-85 rounded-xl overflow-hidden">
                         <Image
                             src="/logo3.png"
                             alt="BoardGameMatch Logo"

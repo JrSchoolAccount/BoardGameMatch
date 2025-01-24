@@ -10,4 +10,5 @@ export interface MessagesProps {
     errorMessage: string;
     currentConversation: string;
     currentConversationStatus: boolean;
+    toggleMobileSidebar: () => void;
 }

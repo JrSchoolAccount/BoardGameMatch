@@ -19,6 +19,7 @@ const Messages = ({
     sendMessage,
     currentConversation,
     currentConversationStatus,
+    toggleMobileSidebar,
 }: MessagesProps) => {
     const [message, setMessage] = useState<string>('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -55,7 +56,10 @@ const Messages = ({
             <div className="w-full h-15 p-1 bg-purple-600 dark:bg-gray-800 shadow-md rounded-xl rounded-bl-none rounded-br-none">
                 <div className="flex p-2 align-middle items-center">
                     {/* Back Button */}
-                    <div className="p-2 md:hidden rounded-full mr-1 hover:bg-purple-500 text-white">
+                    <div
+                        className="p-2 md:hidden rounded-full mr-1 hover:bg-purple-500 text-white cursor-pointer"
+                        onClick={toggleMobileSidebar}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-6 w-6"
@@ -67,7 +71,7 @@ const Messages = ({
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                                d="M4 6h16M4 12h16M4 18h16"
                             />
                         </svg>
                     </div>

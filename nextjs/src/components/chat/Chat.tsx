@@ -20,6 +20,7 @@ const Chat = ({ session }: ChatProps) => {
     const [currentConversation, setCurrentConversation] = useState<string>('');
     const [currentConversationStatus, setCurrentConversationStatus] =
         useState(false);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     const username = session?.user?.name;
 
@@ -105,6 +106,11 @@ const Chat = ({ session }: ChatProps) => {
 
     const handleConversationClick = (userID: string) => {
         setCurrentConversation(userID);
+        setIsMobileSidebarOpen(false);
+    };
+
+    const toggleMobileSidebar = () => {
+        setIsMobileSidebarOpen(!isMobileSidebarOpen);
     };
 
     const sendMessage = (message: string) => {
@@ -123,11 +129,37 @@ const Chat = ({ session }: ChatProps) => {
     return (
         <div className="flex bg-white dark:bg-gray-900">
             {/* Chat Section */}
-            <div className="w-80 h-screen dark:bg-gray-800 bg-gray-100 p-2 hidden md:block">
+            <div
+                className={`w-80 h-screen dark:bg-gray-800 bg-gray-100 p-2 md:block fixed md:static left-0 top-0 bottom-0 z-50 transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+            >
                 <div className="h-full overflow-y-auto">
-                    <div className="text-xl font-extrabold text-gray-600 dark:text-gray-200 p-3">
-                        {session?.user?.name ? `${session.user.name}` : null}
+                    <div className="flex justify-between items-center">
+                        <div className="text-xl font-extrabold text-gray-600 dark:text-gray-200 p-3">
+                            {session?.user?.name
+                                ? `${session.user.name}`
+                                : null}
+                        </div>
+                        <button
+                            className="md:hidden p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                            onClick={toggleMobileSidebar}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
                     </div>
+
                     <div className="search-chat flex p-3">
                         <input
                             className="input text-gray-700 dark:text-gray-200 text-sm p-3 focus:outline-none bg-gray-200 dark:bg-gray-700 w-full rounded-l-md"
@@ -174,9 +206,10 @@ const Chat = ({ session }: ChatProps) => {
                         sendMessage={sendMessage}
                         currentConversation={currentConversation}
                         currentConversationStatus={currentConversationStatus}
+                        toggleMobileSidebar={toggleMobileSidebar}
                     />
                 ) : (
-                    <Welcome />
+                    <Welcome toggleMobileSidebar={toggleMobileSidebar} />
                 )}
             </div>
         </div>
