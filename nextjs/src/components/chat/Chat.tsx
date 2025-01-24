@@ -132,7 +132,7 @@ const Chat = ({ session }: ChatProps) => {
             <div
                 className={`w-80 h-screen dark:bg-gray-800 bg-gray-100 p-2 md:block fixed md:static left-0 top-0 bottom-0 z-50 transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
             >
-                <div className="h-full overflow-y-auto">
+                <div className="h-full overflow-y-auto pb-16">
                     <div className="flex justify-between items-center">
                         <div className="text-xl font-extrabold text-gray-600 dark:text-gray-200 p-3">
                             {session?.user?.name
@@ -195,7 +195,7 @@ const Chat = ({ session }: ChatProps) => {
             </div>
 
             {/* Messages */}
-            <div className="flex-grow h-screen p-2 rounded-md">
+            <div className="flex-grow h-screen p-2 rounded-md pb-[93px]">
                 {currentConversation ? (
                     <Messages
                         session={session}

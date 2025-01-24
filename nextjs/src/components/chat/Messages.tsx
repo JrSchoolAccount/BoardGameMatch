@@ -252,12 +252,12 @@ const Messages = ({
                         <div
                             role="button"
                             tabIndex={0}
-                            className="bg-gray-100 hover:bg-gray-500 dark:bg-gray-800 dark:text-gray-200 flex justify-center items-center pr-3 text-gray-400 rounded-r-md"
+                            className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 flex justify-center items-center pr-3 text-gray-400 rounded-r-md group"
                             onClick={handleSendMessage}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6"
+                                className="h-6 w-6 group-hover:text-white"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
