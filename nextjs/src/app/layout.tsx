@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 import NavbarWrapper from '@/components/NavbarWrapper';
+import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
     title: 'BoardGameMatch',
@@ -18,6 +19,7 @@ export default function RootLayout({
             <body className={'antialiased'}>
                 <NavbarWrapper />
                 {children}
+                <Footer />
             </body>
         </html>
     );
