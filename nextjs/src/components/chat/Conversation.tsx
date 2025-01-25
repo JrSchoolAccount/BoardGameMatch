@@ -28,7 +28,7 @@ const Conversation = ({
             (user) => user.username === conversationId
         );
         setCurrentConversationStatus(currentUser?.connected ?? false);
-    }, [conversationId, users]);
+    }, [conversationId, users, setCurrentConversationStatus]);
 
     useEffect(() => {
         const handleUsers = (userList: User[]) => {
