@@ -17,7 +17,7 @@ const Footer = () => {
                         <ul className="flex space-x-4 items-center">
                             <li>
                                 <Link
-                                    href="/terms"
+                                    href="#"
                                     className="text-sm hover:text-teal-400 transition-colors"
                                 >
                                     Terms of Service
@@ -25,7 +25,7 @@ const Footer = () => {
                             </li>
                             <li>
                                 <Link
-                                    href="/privacy"
+                                    href="#"
                                     className="text-sm hover:text-teal-400 transition-colors"
                                 >
                                     Privacy Policy
@@ -33,7 +33,7 @@ const Footer = () => {
                             </li>
                             <li>
                                 <Link
-                                    href="/contact"
+                                    href="#"
                                     className="text-sm hover:text-teal-400 transition-colors"
                                 >
                                     Contact Us
