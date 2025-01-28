@@ -200,24 +200,24 @@ const Navbar = ({ session }: NavbarProps) => {
                                             Sign Out
                                         </Button>
                                     </li>
-                                     <li>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="w-full bg-teal-500/10 text-teal-400 border-teal-400 hover:bg-teal-500/20 font-medium"
-                                >
-                                    <Link
-                                        href="/chat"
-                                        onClick={() =>
-                                            setIsMenuOpen(!isMenuOpen)
-                                        }
-                                        className="flex items-center justify-center space-x-2"
-                                    >
-                                        <MessageCircle className="h-4 w-4" />
-                                        <span>Chat</span>
-                                    </Link>
-                                </Button>
-                            </li>
+                                    <li>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full bg-teal-500/10 text-teal-400 border-teal-400 hover:bg-teal-500/20 font-medium"
+                                        >
+                                            <Link
+                                                href="/chat"
+                                                onClick={() =>
+                                                    setIsMenuOpen(!isMenuOpen)
+                                                }
+                                                className="flex items-center justify-center space-x-2"
+                                            >
+                                                <MessageCircle className="h-4 w-4" />
+                                                <span>Chat</span>
+                                            </Link>
+                                        </Button>
+                                    </li>
                                 </>
                             )}
                         </ul>
