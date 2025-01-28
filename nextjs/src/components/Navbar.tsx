@@ -200,9 +200,7 @@ const Navbar = ({ session }: NavbarProps) => {
                                             Sign Out
                                         </Button>
                                     </li>
-                                </>
-                            )}
-                            <li>
+                                     <li>
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -220,6 +218,8 @@ const Navbar = ({ session }: NavbarProps) => {
                                     </Link>
                                 </Button>
                             </li>
+                                </>
+                            )}
                         </ul>
                     </nav>
                 )}
