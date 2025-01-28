@@ -84,7 +84,7 @@ const Register = ({ isLink = false }: RegisterProps) => {
         e.preventDefault();
         if (validateForm()) {
             // Handle registration logic here
-            console.log('Form submitted:', formData);
+            console.info('Form submitted:', formData);
             closeModal();
         }
     };
@@ -144,7 +144,7 @@ const Register = ({ isLink = false }: RegisterProps) => {
                                 variant="outline"
                                 onClick={() =>
                                     signIn('github', {
-                                        callbackUrl: '/profile',
+                                        callbackUrl: '/chat',
                                     })
                                 }
                                 className="w-full justify-start text-white hover:text-teal-400 hover:border-teal-400"

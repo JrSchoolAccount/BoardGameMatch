@@ -77,7 +77,7 @@ export function SignIn() {
                                 variant="outline"
                                 onClick={() =>
                                     signIn('github', {
-                                        callbackUrl: '/profile',
+                                        callbackUrl: '/chat',
                                     })
                                 }
                                 className="w-full justify-start text-white hover:text-teal-400 hover:border-teal-400"

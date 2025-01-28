@@ -51,13 +51,6 @@ class WebSocketServer {
         });
 
         this.io.on('connection', async (socket) => {
-            console.log(
-                `Client connected: ${socket.id}, Origin: ${socket.handshake.headers.origin}, username: ${socket.handshake.auth.username}`
-            );
-            console.log(
-                `Total clients connected: ${this.io.engine.clientsCount}`
-            );
-
             const sendRecentMessages = async () => {
                 try {
                     const recentMessages = await Message.find({
@@ -66,7 +59,7 @@ class WebSocketServer {
                         .sort({ timestamp: -1 })
                         .limit(100);
 
-                    console.log('Sending recent messages to:', socket.userID);
+                    console.info('Sending recent messages to:', socket.userID);
                     socket.emit(
                         'recent-messages',
                         [...recentMessages].reverse()

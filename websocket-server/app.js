@@ -18,7 +18,7 @@ const initServer = async () => {
         });
 
         server.listen(port, () => {
-            console.log(`WebSocket server is running on port: ${port}`);
+            console.info(`WebSocket server is running on port: ${port}`);
         });
     } catch (e) {
         console.error(`Error while starting server: ${e.message}`);

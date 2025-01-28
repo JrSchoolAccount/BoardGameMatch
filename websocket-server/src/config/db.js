@@ -12,9 +12,9 @@ const connectDB = async (uri = process.env.MONGODB_URI) => {
         const connection = await mongoose.connect(uri);
 
         if (process.env.NODE_ENV !== 'production') {
-            console.log(`MongoDB connected: ${connection.connection.host}`);
+            console.info(`MongoDB connected: ${connection.connection.host}`);
         } else {
-            console.log('MongoDB connected successfully');
+            console.info('MongoDB connected successfully');
         }
 
         return connection;
