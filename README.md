@@ -12,7 +12,7 @@ server and uses **NextAuth.js** for authentication via GitHub.
 Navigate to the frontend folder:
 
 ```bash
-cd ./nextjs
+cd ./nextjs 
 ```
 
 Install the dependencies:
