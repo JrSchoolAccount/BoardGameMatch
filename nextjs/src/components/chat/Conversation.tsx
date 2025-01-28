@@ -1,53 +1,126 @@
-import ConversationItem from '@/components/chat/ConversationItem';
+'use client';
 
-const Conversation = () => {
-    type ConversationData = {
-        name: string;
-        time: string;
-        message: string;
-        active?: boolean;
-    };
-    const data: ConversationData[] = [
-        {
-            name: 'John Doe',
-            time: 'just now',
-            message: 'Hey there! Are you finish creating the chat app?',
-            active: true,
-        },
-        {
-            name: 'Cherry Ann',
-            time: '12:00',
-            message: 'Hello? Are you available tonight?',
-        },
-        {
-            name: 'Lalaine',
-            time: 'yesterday',
-            message: "I'm thinking of resigning",
-        },
-        { name: 'Princess', time: '1 day ago', message: 'I found a job :)' },
-        {
-            name: 'Charm',
-            time: '1 day ago',
-            message: 'Can you get me some chocolates?',
-        },
-        {
-            name: 'Garen',
-            time: '1 day ago',
-            message: "I'm the bravest of all kind",
-        },
-    ];
+import ConversationItem from '@/components/chat/ConversationItem';
+import { useEffect, useState } from 'react';
+import { socket } from '@/app/socket';
+import { User } from '@/components/chat/models/User';
+import FormatTimestamp from '@/components/chat/FormatTimestamp';
+
+interface ConversationProps {
+    username: string | null | undefined;
+    onConversationClick: (userID: string) => void;
+    conversationId: string;
+    setCurrentConversationStatus: (status: boolean) => void;
+}
+
+const Conversation = ({
+    username,
+    conversationId,
+    onConversationClick,
+    setCurrentConversationStatus,
+}: ConversationProps) => {
+    const [users, setUsers] = useState<User[]>([]);
+
+    const currentUser = username;
+
+    useEffect(() => {
+        const currentUser = users.find(
+            (user) => user.username === conversationId
+        );
+        setCurrentConversationStatus(currentUser?.connected ?? false);
+    }, [conversationId, users, setCurrentConversationStatus]);
+
+    useEffect(() => {
+        const handleUsers = (userList: User[]) => {
+            setUsers(userList);
+        };
+
+        const handleUserConnected = (newUser: User) => {
+            setUsers((prevUsers) => {
+                const userExists = prevUsers.some(
+                    (user) => user.userID === newUser.userID
+                );
+                if (userExists) {
+                    return prevUsers.map((user) =>
+                        user.userID === newUser.userID
+                            ? { ...user, connected: true }
+                            : user
+                    );
+                }
+                return [...prevUsers, newUser];
+            });
+        };
+
+        const handleUserDisconnected = (userID: string) => {
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user.userID === userID
+                        ? { ...user, connected: false }
+                        : user
+                )
+            );
+        };
+
+        socket.on('users', handleUsers);
+        socket.on('user connected', handleUserConnected);
+        socket.on('user disconnected', handleUserDisconnected);
+
+        return () => {
+            socket.off('users', handleUsers);
+            socket.off('user connected', handleUserConnected);
+            socket.off('user disconnected', handleUserDisconnected);
+        };
+    }, []);
+
+    const onlineUsers = users.filter(
+        (item) => item.connected && item.username !== currentUser
+    );
+    const offlineUsers = users.filter(
+        (item) => !item.connected && item.username !== currentUser
+    );
 
     return (
-        <div className="p-1">
-            {data.map((item, index) => (
-                <ConversationItem
-                    key={index} // Always provide a unique key for mapped items
-                    message={item.message}
-                    time={item.time}
-                    name={item.name}
-                    active={item.active}
-                />
-            ))}
+        <div>
+            <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
+                Online Users:
+            </div>
+            <div className="p-1">
+                {onlineUsers.map((item, index) => (
+                    <ConversationItem
+                        key={index}
+                        lastMessage={item.lastMessage?.content || 'New User'}
+                        time={
+                            item.lastMessage?.timestamp
+                                ? FormatTimestamp(item.lastMessage.timestamp)
+                                : '13:37'
+                        }
+                        name={item.username}
+                        status={item.connected}
+                        active={conversationId === item.username}
+                        onClick={() => onConversationClick(item.username)}
+                    />
+                ))}
+            </div>
+            <div className="text-lg font-semibold text-gray-600 dark:text-gray-200 p-3">
+                Offline Users:
+            </div>
+            <div className="p-1">
+                {offlineUsers.map((item, index) => (
+                    <ConversationItem
+                        key={index}
+                        lastMessage={item.lastMessage?.content || 'New User'}
+                        time={
+                            item.lastMessage?.timestamp
+                                ? FormatTimestamp(item.lastMessage.timestamp)
+                                : '13:37'
+                        }
+                        name={item.username}
+                        status={item.connected}
+                        active={conversationId === item.username}
+                        onClick={() => onConversationClick(item.username)}
+                    />
+                ))}
+            </div>
         </div>
     );
 };

@@ -17,6 +17,9 @@ const Messages = ({
     isConnected,
     errorMessage,
     sendMessage,
+    currentConversation,
+    currentConversationStatus,
+    toggleMobileSidebar,
 }: MessagesProps) => {
     const [message, setMessage] = useState<string>('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -30,7 +33,7 @@ const Messages = ({
             chatContainerRef.current.scrollTop =
                 chatContainerRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, currentConversation]);
 
     const handleSendMessage = () => {
         if (message.trim()) {
@@ -53,7 +56,10 @@ const Messages = ({
             <div className="w-full h-15 p-1 bg-purple-600 dark:bg-gray-800 shadow-md rounded-xl rounded-bl-none rounded-br-none">
                 <div className="flex p-2 align-middle items-center">
                     {/* Back Button */}
-                    <div className="p-2 md:hidden rounded-full mr-1 hover:bg-purple-500 text-white">
+                    <div
+                        className="p-2 md:hidden rounded-full mr-1 hover:bg-purple-500 text-white cursor-pointer"
+                        onClick={toggleMobileSidebar}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-6 w-6"
@@ -65,7 +71,7 @@ const Messages = ({
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                                d="M4 6h16M4 12h16M4 18h16"
                             />
                         </svg>
                     </div>
@@ -82,12 +88,16 @@ const Messages = ({
                     {/* User Info */}
                     <div className="flex-grow p-2">
                         <div className="text-md text-gray-50 font-semibold">
-                            John Doe
+                            {currentConversation}
                         </div>
                         <div className="flex items-center">
-                            <div className="w-2 h-2 bg-green-300 rounded-full"></div>
+                            <div
+                                className={`w-2 h-2 ${currentConversationStatus ? 'bg-green-300' : 'bg-red-500'} rounded-full`}
+                            ></div>
                             <div className="text-xs text-gray-50 ml-1">
-                                Online
+                                {currentConversationStatus
+                                    ? 'Online'
+                                    : 'Offline'}
                             </div>
                         </div>
                     </div>
@@ -156,31 +166,40 @@ const Messages = ({
                 )}
                 {/* Messages Section */}
                 <div className="flex flex-col items-start space-y-2">
-                    {messages.map((msg, index) => (
-                        <div
-                            key={index}
-                            className={`flex ${msg.username === session?.user?.name ? 'justify-end' : 'justify-start'} w-full`}
-                        >
+                    {messages
+                        .filter(
+                            (msg) =>
+                                (msg.from === session?.user?.name &&
+                                    msg.to === currentConversation) ||
+                                (msg.from === currentConversation &&
+                                    msg.to === session?.user?.name)
+                        )
+                        .map((msg, index) => (
                             <div
-                                className={`p-3 mb-2 max-w-sm w-auto rounded-2xl ${msg.username === session?.user?.name ? 'bg-purple-500 dark:bg-gray-800' : 'bg-purple-300 dark:bg-gray-700'}`}
+                                key={index}
+                                className={`flex ${msg.from === session?.user?.name ? 'justify-end' : 'justify-start'} w-full`}
                             >
-                                <div className="text-xs text-gray-600 dark:text-gray-200">
-                                    {msg.username}
-                                </div>
-                                <div className="group relative">
-                                    {/* Message Content */}
-                                    <div className="text-gray-700 dark:text-gray-200">
-                                        {msg.message}
+                                <div
+                                    className={`p-3 mb-2 max-w-sm w-auto rounded-2xl ${msg.from === session?.user?.name ? 'bg-purple-500 dark:bg-gray-800' : 'bg-purple-300 dark:bg-gray-700'}`}
+                                >
+                                    {/* Username */}
+                                    <div className="text-xs text-gray-600 dark:text-gray-200">
+                                        {msg.from}:
                                     </div>
+                                    <div className="group relative">
+                                        {/* Message Content */}
+                                        <div className="text-gray-700 dark:text-gray-200">
+                                            {msg.content}
+                                        </div>
 
-                                    {/* Timestamp */}
-                                    <div className="absolute -bottom-7 left-0 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        {FormatTimestamp(msg.timestamp)}
+                                        {/* Timestamp */}
+                                        <div className="absolute -bottom-7 left-0 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {FormatTimestamp(msg.timestamp)}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </div>
 
@@ -188,7 +207,7 @@ const Messages = ({
             <div className="h-15 p-3 rounded-xl rounded-tr-none rounded-tl-none bg-gray-100 dark:bg-gray-800">
                 <div className="flex items-center">
                     {/* Emoji Icon */}
-                    <div className="p-2 text-gray-600 dark:text-gray-200 relative">
+                    <div className="p-2 hover:bg-gray-900 text-gray-600 dark:text-gray-200 rounded-full relative">
                         <div role="button" onClick={toggleEmojiPicker}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -233,12 +252,12 @@ const Messages = ({
                         <div
                             role="button"
                             tabIndex={0}
-                            className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 flex justify-center items-center pr-3 text-gray-400 rounded-r-md"
+                            className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 flex justify-center items-center pr-3 text-gray-400 rounded-r-md group"
                             onClick={handleSendMessage}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6"
+                                className="h-6 w-6 group-hover:text-white"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"

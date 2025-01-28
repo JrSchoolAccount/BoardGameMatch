@@ -9,9 +9,23 @@ import Register from '@/components/Register';
 
 export function SignIn() {
     const [isOpen, setIsOpen] = useState(false);
+    const [username, setUsername] = useState('');
 
     const openModal = () => setIsOpen(true);
     const closeModal = () => setIsOpen(false);
+
+    const handleDummySignIn = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (username.trim()) {
+            await signIn('credentials', {
+                username,
+                callbackUrl: '/chat',
+            });
+        } else {
+            alert('Please enter a valid username.');
+        }
+    };
 
     return (
         <>
@@ -63,7 +77,7 @@ export function SignIn() {
                                 variant="outline"
                                 onClick={() =>
                                     signIn('github', {
-                                        callbackUrl: '/profile',
+                                        callbackUrl: '/chat',
                                     })
                                 }
                                 className="w-full justify-start text-white hover:text-teal-400 hover:border-teal-400"
@@ -116,10 +130,15 @@ export function SignIn() {
                             <hr className="w-full border-gray-600" />
                         </div>
 
-                        <form className="space-y-4">
+                        <form
+                            className="space-y-4"
+                            onSubmit={handleDummySignIn}
+                        >
                             <Input
-                                type="email"
-                                placeholder="Email Address"
+                                type="username"
+                                placeholder="Username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-teal-500"
                             />
                             <Input

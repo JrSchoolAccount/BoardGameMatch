@@ -8,4 +8,7 @@ export interface MessagesProps {
     isLoading: boolean;
     isConnected: boolean;
     errorMessage: string;
+    currentConversation: string;
+    currentConversationStatus: boolean;
+    toggleMobileSidebar: () => void;
 }
